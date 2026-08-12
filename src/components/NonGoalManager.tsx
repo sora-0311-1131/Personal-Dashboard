@@ -35,19 +35,19 @@ export default function NonGoalManager() {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold flex items-center gap-2">
           <ShieldAlert className="w-5 h-5 text-rose-500" />
-          Non-Goals
+          あえてやらないこと (Non-Goals)
         </h2>
         <button
           onClick={() => setIsCreating(!isCreating)}
           className="text-sm flex items-center gap-1 text-rose-600 hover:text-rose-700 font-medium"
         >
           <Plus className="w-4 h-4" />
-          Add
+          追加
         </button>
       </div>
 
       <p className="text-sm text-neutral-500 mb-4">
-        Things you explicitly decide <strong>not</strong> to pursue in this period.
+        この期間に <strong>あえてやらない</strong> と決めたこと。
       </p>
 
       {isCreating && (
@@ -55,7 +55,7 @@ export default function NonGoalManager() {
           <input
             type="text"
             required
-            placeholder="e.g. Do not over-engineer the UI"
+            placeholder="例: UIを作り込みすぎない"
             className="flex-1 px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-rose-500 text-sm"
             value={title}
             onChange={e => setTitle(e.target.value)}
@@ -65,20 +65,20 @@ export default function NonGoalManager() {
             onClick={() => setIsCreating(false)}
             className="px-3 py-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
           >
-            Cancel
+            キャンセル
           </button>
           <button
             type="submit"
             className="px-4 py-2 text-sm font-medium bg-rose-600 text-white rounded-md hover:bg-rose-700 focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900"
           >
-            Add
+            追加
           </button>
         </form>
       )}
 
       {currentNonGoals.length === 0 && !isCreating ? (
         <div className="text-center py-4 text-neutral-500 text-sm">
-          No Non-Goals defined.
+          設定されていません。
         </div>
       ) : (
         <ul className="space-y-2">

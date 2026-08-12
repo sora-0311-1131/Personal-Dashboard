@@ -46,41 +46,41 @@ export default function GoalManager() {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold flex items-center gap-2">
           <Target className="w-5 h-5 text-indigo-500" />
-          Goals
+          目標 (Goals)
         </h2>
         <button
           onClick={() => setIsCreating(!isCreating)}
           className="text-sm flex items-center gap-1 text-indigo-600 hover:text-indigo-700 font-medium"
         >
           <Plus className="w-4 h-4" />
-          New Goal
+          新規作成
         </button>
       </div>
 
       {isCreating && (
         <form onSubmit={handleCreate} className="mb-6 bg-neutral-50 dark:bg-neutral-800/50 p-4 rounded-lg space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Goal Title</label>
+            <label className="block text-sm font-medium mb-1">目標タイトル</label>
             <input
               type="text"
               required
-              placeholder="e.g. Finish Personal Dashboard"
+              placeholder="例: パーソナルダッシュボードを完成させる"
               className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-indigo-500"
               value={newGoal.title}
               onChange={e => setNewGoal({ ...newGoal, title: e.target.value })}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Priority</label>
+            <label className="block text-sm font-medium mb-1">優先度</label>
             <select
               className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-indigo-500"
               value={newGoal.priority}
               onChange={e => setNewGoal({ ...newGoal, priority: e.target.value as Priority })}
             >
-              <option value="P1">P1 - Highest</option>
-              <option value="P2">P2 - Medium</option>
-              <option value="P3">P3 - Low</option>
-              <option value="none">None</option>
+              <option value="P1">P1 - 最高</option>
+              <option value="P2">P2 - 中</option>
+              <option value="P3">P3 - 低</option>
+              <option value="none">なし</option>
             </select>
           </div>
           <div className="flex justify-end gap-2 pt-2">
@@ -89,13 +89,13 @@ export default function GoalManager() {
               onClick={() => setIsCreating(false)}
               className="px-4 py-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
             >
-              Cancel
+              キャンセル
             </button>
             <button
               type="submit"
               className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900"
             >
-              Create
+              作成
             </button>
           </div>
         </form>
@@ -103,7 +103,7 @@ export default function GoalManager() {
 
       {currentGoals.length === 0 && !isCreating ? (
         <div className="text-center py-6 text-neutral-500">
-          <p>No goals set for this period.</p>
+          <p>この期間の目標はまだ設定されていません。</p>
         </div>
       ) : (
         <ul className="space-y-3">

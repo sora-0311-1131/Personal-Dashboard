@@ -38,38 +38,38 @@ export default function ProjectManager() {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold flex items-center gap-2">
           <Folder className="w-5 h-5 text-amber-500" />
-          Projects
+          プロジェクト (Projects)
         </h2>
         <button
           onClick={() => setIsCreating(!isCreating)}
           className="text-sm flex items-center gap-1 text-amber-600 hover:text-amber-700 font-medium"
         >
           <Plus className="w-4 h-4" />
-          New Project
+          新規作成
         </button>
       </div>
 
       {isCreating && (
         <form onSubmit={handleCreate} className="mb-6 bg-neutral-50 dark:bg-neutral-800/50 p-4 rounded-lg space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Project Title</label>
+            <label className="block text-sm font-medium mb-1">プロジェクトタイトル</label>
             <input
               type="text"
               required
-              placeholder="e.g. Website Redesign"
+              placeholder="例: ウェブサイトのリニューアル"
               className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-amber-500"
               value={newProject.title}
               onChange={e => setNewProject({ ...newProject, title: e.target.value })}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Link to Goal (Optional)</label>
+            <label className="block text-sm font-medium mb-1">目標に紐付ける (任意)</label>
             <select
               className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-amber-500"
               value={newProject.goalId}
               onChange={e => setNewProject({ ...newProject, goalId: e.target.value })}
             >
-              <option value="">-- No specific goal --</option>
+              <option value="">-- 紐付けなし --</option>
               {currentGoals.map(g => (
                 <option key={g.id} value={g.id}>{g.title}</option>
               ))}
@@ -81,13 +81,13 @@ export default function ProjectManager() {
               onClick={() => setIsCreating(false)}
               className="px-4 py-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
             >
-              Cancel
+              キャンセル
             </button>
             <button
               type="submit"
               className="px-4 py-2 text-sm font-medium bg-amber-600 text-white rounded-md hover:bg-amber-700 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900"
             >
-              Create
+              作成
             </button>
           </div>
         </form>
@@ -96,8 +96,8 @@ export default function ProjectManager() {
       {currentProjects.length === 0 && !isCreating ? (
         <div className="text-center py-10 border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-lg flex flex-col items-center justify-center text-neutral-500">
           <Folder className="w-8 h-8 text-neutral-400 mb-3 opacity-50" />
-          <p className="font-medium text-neutral-600 dark:text-neutral-400">No projects created yet.</p>
-          <p className="text-sm mt-1">Group your tasks into projects.</p>
+          <p className="font-medium text-neutral-600 dark:text-neutral-400">プロジェクトがまだありません。</p>
+          <p className="text-sm mt-1">タスクをプロジェクトにまとめましょう。</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -121,7 +121,7 @@ export default function ProjectManager() {
                   {linkedGoal && (
                     <p className="text-xs text-neutral-500 mt-2 flex items-center gap-1">
                       <span className="inline-block w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
-                      Goal: {linkedGoal.title}
+                      目標: {linkedGoal.title}
                     </p>
                   )}
                 </div>

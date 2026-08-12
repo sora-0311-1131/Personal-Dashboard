@@ -39,9 +39,9 @@ export default function Home() {
               </div>
             ) : (
               <div>
-                <h1 className="text-3xl font-bold text-neutral-900 dark:text-white mb-2">Welcome</h1>
+                <h1 className="text-3xl font-bold text-neutral-900 dark:text-white mb-2">ようこそ</h1>
                 <p className="text-neutral-500">
-                  Select or create a period to start focusing.
+                  期間（Period）を選択または作成して開始してください。
                 </p>
               </div>
             )}

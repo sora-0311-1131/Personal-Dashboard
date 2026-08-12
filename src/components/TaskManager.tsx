@@ -44,25 +44,25 @@ export default function TaskManager() {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold flex items-center gap-2">
           <CheckSquare className="w-5 h-5 text-emerald-500" />
-          Tasks
+          タスク (Tasks)
         </h2>
         <button
           onClick={() => setIsCreating(!isCreating)}
           className="text-sm flex items-center gap-1 text-emerald-600 hover:text-emerald-700 font-medium"
         >
           <Plus className="w-4 h-4" />
-          New Task
+          新規作成
         </button>
       </div>
 
       {isCreating && (
         <form onSubmit={handleCreate} className="mb-6 bg-neutral-50 dark:bg-neutral-800/50 p-4 rounded-lg space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Task Title</label>
+            <label className="block text-sm font-medium mb-1">タスク名</label>
             <input
               type="text"
               required
-              placeholder="e.g. Write PRD"
+              placeholder="例: PRDを作成する"
               className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-emerald-500"
               value={newTask.title}
               onChange={e => setNewTask({ ...newTask, title: e.target.value })}
@@ -70,26 +70,26 @@ export default function TaskManager() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Link to Project (Optional)</label>
+              <label className="block text-sm font-medium mb-1">プロジェクトに紐付ける (任意)</label>
               <select
                 className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-emerald-500"
                 value={newTask.projectId}
                 onChange={e => setNewTask({ ...newTask, projectId: e.target.value })}
               >
-                <option value="">-- No specific project --</option>
+                <option value="">-- 紐付けなし --</option>
                 {currentProjects.map(p => (
                   <option key={p.id} value={p.id}>{p.title}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Link to Goal (Optional)</label>
+              <label className="block text-sm font-medium mb-1">目標に紐付ける (任意)</label>
               <select
                 className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-emerald-500"
                 value={newTask.goalId}
                 onChange={e => setNewTask({ ...newTask, goalId: e.target.value })}
               >
-                <option value="">-- No specific goal --</option>
+                <option value="">-- 紐付けなし --</option>
                 {currentGoals.map(g => (
                   <option key={g.id} value={g.id}>{g.title}</option>
                 ))}
@@ -102,13 +102,13 @@ export default function TaskManager() {
               onClick={() => setIsCreating(false)}
               className="px-4 py-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
             >
-              Cancel
+              キャンセル
             </button>
             <button
               type="submit"
               className="px-4 py-2 text-sm font-medium bg-emerald-600 text-white rounded-md hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900"
             >
-              Create
+              作成
             </button>
           </div>
         </form>
@@ -117,8 +117,8 @@ export default function TaskManager() {
       {currentTasks.length === 0 && !isCreating ? (
         <div className="text-center py-10 border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-lg flex flex-col items-center justify-center text-neutral-500">
           <CheckSquare className="w-8 h-8 text-neutral-400 mb-3 opacity-50" />
-          <p className="font-medium text-neutral-600 dark:text-neutral-400">No tasks for this period.</p>
-          <p className="text-sm mt-1">Add a task to start executing your goals.</p>
+          <p className="font-medium text-neutral-600 dark:text-neutral-400">タスクがまだありません。</p>
+          <p className="text-sm mt-1">タスクを追加して行動を開始しましょう。</p>
         </div>
       ) : (
         <ul className="space-y-2">
@@ -149,8 +149,8 @@ export default function TaskManager() {
                   </span>
                   {(project || goal) && !isDone && (
                     <div className="flex gap-2 mt-1 text-xs text-neutral-500">
-                      {project && <span className="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-1.5 py-0.5 rounded">Project: {project.title}</span>}
-                      {goal && <span className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 px-1.5 py-0.5 rounded">Goal: {goal.title}</span>}
+                      {project && <span className="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-1.5 py-0.5 rounded">プロジェクト: {project.title}</span>}
+                      {goal && <span className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 px-1.5 py-0.5 rounded">目標: {goal.title}</span>}
                     </div>
                   )}
                 </div>
