@@ -34,13 +34,17 @@ export interface Project {
   status: EntityStatus;
 }
 
+export type TaskStatus = 'todo' | 'in-progress' | 'pending' | 'done';
+export type TaskPriority = 'P0' | 'P1' | 'P2';
+
 export interface Task {
   id: string;
   periodId: string;
   projectId?: string;
   goalId?: string;
   title: string;
-  description?: string;
-  dueDate?: string; // ISO date string
-  status: EntityStatus;
+  notes?: string;
+  deadline?: string; // ISO date string
+  priority: TaskPriority;
+  status: TaskStatus;
 }
