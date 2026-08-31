@@ -25,13 +25,18 @@ export interface NonGoal {
   description?: string;
 }
 
+export type ProjectStatus = 'todo' | 'in-progress' | 'pending' | 'done';
+export type ProjectPriority = 'P0' | 'P1' | 'P2';
+
 export interface Project {
   id: string;
   periodId: string;
   goalId?: string;
   title: string;
-  description?: string;
-  status: EntityStatus;
+  notes?: string;
+  deadline?: string;
+  priority: ProjectPriority;
+  status: ProjectStatus;
 }
 
 export type TaskStatus = 'todo' | 'in-progress' | 'pending' | 'done';
