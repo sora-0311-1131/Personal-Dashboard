@@ -95,7 +95,7 @@ export default function GoalManager() {
 
   return (
     <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-6 shadow-sm">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+      <div className="flex flex-col sm:flex-row xl:flex-col sm:items-center xl:items-start justify-between mb-6 gap-4">
         <h2 className="text-xl font-semibold flex items-center gap-2">
           <Target className="w-5 h-5 text-indigo-500" />
           Goals
@@ -272,7 +272,7 @@ export default function GoalManager() {
                 key={goal.id}
                 onMouseEnter={() => setHoveredGoalId(goal.id)}
                 onMouseLeave={() => setHoveredGoalId(null)}
-                className={`flex flex-col sm:flex-row sm:items-start gap-4 p-4 rounded-lg border transition-colors ${
+                className={`flex flex-col sm:flex-row xl:flex-col sm:items-start gap-4 p-4 rounded-lg border transition-colors ${
                   isDone
                     ? 'border-neutral-100 dark:border-neutral-800/50 bg-neutral-50/50 dark:bg-neutral-900/50'
                     : 'border-neutral-200 dark:border-neutral-800 hover:border-indigo-300 dark:hover:border-indigo-700'
@@ -291,13 +291,13 @@ export default function GoalManager() {
                 
                 {/* 2. Middle: Title, Priority, Notes */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className={`block break-all ${isDone ? 'text-neutral-400 line-through' : 'text-neutral-900 dark:text-neutral-100 font-medium'}`}>
+                  <div className="leading-snug break-words">
+                    <span className={`font-medium ${isDone ? 'text-neutral-400 line-through' : 'text-neutral-900 dark:text-neutral-100'}`}>
                       {goal.title}
                     </span>
-                    {goal.priority === 'P0' && <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800/50">P0: High</span>}
-                    {goal.priority === 'P1' && <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border border-orange-200 dark:border-orange-800/50">P1: Medium</span>}
-                    {goal.priority === 'P2' && <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800/50">P2: Low</span>}
+                    {goal.priority === 'P0' && <span className="inline-block ml-2 align-middle text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800/50">P0: High</span>}
+                    {goal.priority === 'P1' && <span className="inline-block ml-2 align-middle text-[10px] font-bold px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border border-orange-200 dark:border-orange-800/50">P1: Medium</span>}
+                    {goal.priority === 'P2' && <span className="inline-block ml-2 align-middle text-[10px] font-bold px-1.5 py-0.5 rounded bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800/50">P2: Low</span>}
                   </div>
                   
                   {/* Notes below title */}
