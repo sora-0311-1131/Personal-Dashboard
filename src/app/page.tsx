@@ -36,6 +36,11 @@ export default function Home() {
                 <p className="text-lg text-neutral-500 flex items-center gap-2 font-medium">
                   {currentPeriod.startDate} <span className="opacity-50">—</span> {currentPeriod.endDate}
                 </p>
+                {currentPeriod.notes && (
+                  <p className="mt-4 text-neutral-600 dark:text-neutral-400 whitespace-pre-wrap max-w-2xl leading-relaxed">
+                    {currentPeriod.notes}
+                  </p>
+                )}
               </div>
             ) : (
               <div>

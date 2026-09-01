@@ -1,20 +1,18 @@
 export type EntityStatus = 'todo' | 'in-progress' | 'done';
-export type Priority = 'P1' | 'P2' | 'P3' | 'none';
 
 export interface Period {
   id: string;
   name: string;
   startDate: string; // ISO date string
   endDate: string; // ISO date string
-  description?: string;
+  notes?: string;
 }
 
 export interface Goal {
   id: string;
   periodId: string;
   title: string;
-  description?: string;
-  priority: Priority;
+  notes?: string;
   status: EntityStatus;
 }
 
@@ -22,7 +20,7 @@ export interface NonGoal {
   id: string;
   periodId: string;
   title: string;
-  description?: string;
+  notes?: string;
 }
 
 export type ProjectStatus = 'todo' | 'in-progress' | 'pending' | 'done';

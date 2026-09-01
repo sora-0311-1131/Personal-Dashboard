@@ -25,6 +25,8 @@ interface DashboardContextType {
   state: DashboardState;
   isLoaded: boolean;
   addPeriod: (period: Period) => void;
+  updatePeriod: (id: string, updates: Partial<Period>) => void;
+  deletePeriod: (id: string) => void;
   setCurrentPeriod: (id: string) => void;
   addGoal: (goal: Goal) => void;
   updateGoal: (id: string, updates: Partial<Goal>) => void;
@@ -75,6 +77,32 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         ...prev,
         periods: [...prev.periods, period],
         currentPeriodId: isFirst ? period.id : prev.currentPeriodId,
+      };
+    });
+  };
+
+  const updatePeriod = (id: string, updates: Partial<Period>) => {
+    setState((prev) => ({
+      ...prev,
+      periods: prev.periods.map((p) => (p.id === id ? { ...p, ...updates } : p)),
+    }));
+  };
+
+  const deletePeriod = (id: string) => {
+    setState((prev) => {
+      const remainingPeriods = prev.periods.filter((p) => p.id !== id);
+      let newCurrentPeriodId = prev.currentPeriodId;
+      if (prev.currentPeriodId === id) {
+        newCurrentPeriodId = remainingPeriods.length > 0 ? remainingPeriods[0].id : null;
+      }
+      return {
+        ...prev,
+        periods: remainingPeriods,
+        currentPeriodId: newCurrentPeriodId,
+        goals: prev.goals.filter(g => g.periodId !== id),
+        nonGoals: prev.nonGoals.filter(ng => ng.periodId !== id),
+        projects: prev.projects.filter(p => p.periodId !== id),
+        tasks: prev.tasks.filter(t => t.periodId !== id),
       };
     });
   };
@@ -163,6 +191,8 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         state,
         isLoaded,
         addPeriod,
+        updatePeriod,
+        deletePeriod,
         setCurrentPeriod,
         addGoal,
         updateGoal,

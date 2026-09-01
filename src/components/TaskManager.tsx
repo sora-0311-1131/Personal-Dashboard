@@ -11,6 +11,7 @@ export default function TaskManager() {
   
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editingTaskData, setEditingTaskData] = useState<Partial<Task>>({});
+  const [hoveredTaskId, setHoveredTaskId] = useState<string | null>(null);
 
   const [newTask, setNewTask] = useState<{
     title: string;
@@ -332,7 +333,9 @@ export default function TaskManager() {
             return (
               <li
                 key={task.id}
-                className={`group flex flex-col sm:flex-row sm:items-start gap-4 p-4 rounded-lg border transition-colors ${
+                onMouseEnter={() => setHoveredTaskId(task.id)}
+                onMouseLeave={() => setHoveredTaskId(null)}
+                className={`flex flex-col sm:flex-row sm:items-start gap-4 p-4 rounded-lg border transition-colors ${
                   isDone
                     ? 'border-neutral-100 dark:border-neutral-800/50 bg-neutral-50/50 dark:bg-neutral-900/50'
                     : 'border-neutral-200 dark:border-neutral-800 hover:border-emerald-300 dark:hover:border-emerald-700'
@@ -393,7 +396,7 @@ export default function TaskManager() {
                     <option value="done">Done</option>
                   </select>
 
-                  <div className="flex items-center gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className={`flex items-center gap-1 transition-opacity duration-200 ${hoveredTaskId === task.id ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
                     <button
                       onClick={() => startEditing(task)}
                       className="p-1.5 text-neutral-400 hover:text-blue-500 transition-colors rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20"
