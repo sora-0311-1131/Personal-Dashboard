@@ -16,10 +16,10 @@ export default function ProjectManager() {
   const [newProject, setNewProject] = useState<{
     title: string;
     goalId: string;
-    priority: ProjectPriority;
+    priority: ProjectPriority | '';
     deadline: string;
     notes: string;
-  }>({ title: '', goalId: '', priority: 'P1', deadline: '', notes: '' });
+  }>({ title: '', goalId: '', priority: '' as any, deadline: '', notes: '' });
 
   const [sortBy, setSortBy] = useState<'deadline-asc' | 'priority-desc' | 'status'>('deadline-asc');
 
@@ -36,9 +36,11 @@ export default function ProjectManager() {
         return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
       }
       if (sortBy === 'priority-desc') {
-        const pOrder = { P0: 0, P1: 1, P2: 2 };
-        if (pOrder[a.priority] !== pOrder[b.priority]) {
-          return pOrder[a.priority] - pOrder[b.priority];
+        const pOrder: Record<string, number> = { P0: 0, P1: 1, P2: 2 };
+        const pA = a.priority ? pOrder[a.priority] : 3;
+        const pB = b.priority ? pOrder[b.priority] : 3;
+        if (pA !== pB) {
+          return pA - pB;
         }
         if (!a.deadline && !b.deadline) return 0;
         if (!a.deadline) return 1;
@@ -69,12 +71,12 @@ export default function ProjectManager() {
       title: newProject.title,
       notes: newProject.notes || undefined,
       deadline: newProject.deadline || undefined,
-      priority: newProject.priority,
+      priority: newProject.priority || undefined,
       status: 'todo',
     };
     
     addProject(project);
-    setNewProject({ title: '', goalId: '', priority: 'P1', deadline: '', notes: '' });
+    setNewProject({ title: '', goalId: '', priority: '' as any, deadline: '', notes: '' });
     setIsCreating(false);
   };
 
@@ -155,8 +157,9 @@ export default function ProjectManager() {
               <select
                 className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-amber-500"
                 value={newProject.priority}
-                onChange={e => setNewProject({ ...newProject, priority: e.target.value as ProjectPriority })}
+                onChange={e => setNewProject({ ...newProject, priority: e.target.value as (ProjectPriority | '') })}
               >
+                <option value="">-- 未設定 --</option>
                 <option value="P0">P0: High</option>
                 <option value="P1">P1: Medium</option>
                 <option value="P2">P2: Low</option>
@@ -247,10 +250,11 @@ export default function ProjectManager() {
                       <label className="block text-sm font-medium mb-1">Priority</label>
                       <select
                         className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-blue-500"
-                        value={editingProjectData.priority}
-                        onChange={e => setEditingProjectData({ ...editingProjectData, priority: e.target.value as ProjectPriority })}
+                        value={editingProjectData.priority || ''}
+                        onChange={e => setEditingProjectData({ ...editingProjectData, priority: (e.target.value || undefined) as ProjectPriority | undefined })}
                       >
-                        <option value="P0">P0: High</option>
+                        <option value="">-- 未設定 --</option>
+                <option value="P0">P0: High</option>
                         <option value="P1">P1: Medium</option>
                         <option value="P2">P2: Low</option>
                       </select>

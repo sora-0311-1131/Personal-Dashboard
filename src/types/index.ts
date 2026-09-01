@@ -8,11 +8,15 @@ export interface Period {
   notes?: string;
 }
 
+export type GoalPriority = 'P0' | 'P1' | 'P2';
+
 export interface Goal {
   id: string;
   periodId: string;
   title: string;
   notes?: string;
+  deadline?: string;
+  priority?: GoalPriority;
   status: EntityStatus;
 }
 
@@ -33,7 +37,7 @@ export interface Project {
   title: string;
   notes?: string;
   deadline?: string;
-  priority: ProjectPriority;
+  priority?: ProjectPriority;
   status: ProjectStatus;
 }
 
@@ -48,6 +52,6 @@ export interface Task {
   title: string;
   notes?: string;
   deadline?: string; // ISO date string
-  priority: TaskPriority;
+  priority?: TaskPriority;
   status: TaskStatus;
 }

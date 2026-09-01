@@ -17,10 +17,10 @@ export default function TaskManager() {
     title: string;
     projectId: string;
     goalId: string;
-    priority: TaskPriority;
+    priority: TaskPriority | '';
     deadline: string;
     notes: string;
-  }>({ title: '', projectId: '', goalId: '', priority: 'P1', deadline: '', notes: '' });
+  }>({ title: '', projectId: '', goalId: '', priority: '' as any, deadline: '', notes: '' });
 
   const [sortBy, setSortBy] = useState<'deadline-asc' | 'priority-desc' | 'status'>('deadline-asc');
 
@@ -38,9 +38,11 @@ export default function TaskManager() {
         return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
       }
       if (sortBy === 'priority-desc') {
-        const pOrder = { P0: 0, P1: 1, P2: 2 };
-        if (pOrder[a.priority] !== pOrder[b.priority]) {
-          return pOrder[a.priority] - pOrder[b.priority];
+        const pOrder: Record<string, number> = { P0: 0, P1: 1, P2: 2 };
+        const pA = a.priority ? pOrder[a.priority] : 3;
+        const pB = b.priority ? pOrder[b.priority] : 3;
+        if (pA !== pB) {
+          return pA - pB;
         }
         if (!a.deadline && !b.deadline) return 0;
         if (!a.deadline) return 1;
@@ -72,12 +74,12 @@ export default function TaskManager() {
       title: newTask.title,
       notes: newTask.notes || undefined,
       deadline: newTask.deadline || undefined,
-      priority: newTask.priority,
+      priority: newTask.priority || undefined,
       status: 'todo',
     };
     
     addTask(task);
-    setNewTask({ title: '', projectId: '', goalId: '', priority: 'P1', deadline: '', notes: '' });
+    setNewTask({ title: '', projectId: '', goalId: '', priority: '' as any, deadline: '', notes: '' });
     setIsCreating(false);
   };
 
@@ -158,8 +160,9 @@ export default function TaskManager() {
               <select
                 className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-emerald-500"
                 value={newTask.priority}
-                onChange={e => setNewTask({ ...newTask, priority: e.target.value as TaskPriority })}
+                onChange={e => setNewTask({ ...newTask, priority: e.target.value as (TaskPriority | '') })}
               >
+                <option value="">-- 未設定 --</option>
                 <option value="P0">P0: High</option>
                 <option value="P1">P1: Medium</option>
                 <option value="P2">P2: Low</option>
@@ -265,10 +268,11 @@ export default function TaskManager() {
                       <label className="block text-sm font-medium mb-1">Priority</label>
                       <select
                         className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-blue-500"
-                        value={editingTaskData.priority}
-                        onChange={e => setEditingTaskData({ ...editingTaskData, priority: e.target.value as TaskPriority })}
+                        value={editingTaskData.priority || ''}
+                        onChange={e => setEditingTaskData({ ...editingTaskData, priority: (e.target.value || undefined) as TaskPriority | undefined })}
                       >
-                        <option value="P0">P0: High</option>
+                        <option value="">-- 未設定 --</option>
+                <option value="P0">P0: High</option>
                         <option value="P1">P1: Medium</option>
                         <option value="P2">P2: Low</option>
                       </select>
