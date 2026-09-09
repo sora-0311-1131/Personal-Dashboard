@@ -5,7 +5,11 @@ import { useDashboard } from '@/store/DashboardContext';
 import { Task, TaskPriority, TaskStatus } from '@/types';
 import { CheckSquare, Plus, Trash2, ArrowUpDown, Edit2, X, Check } from 'lucide-react';
 
-export default function TaskManager() {
+export default function TaskManager({
+  filterProjectId,
+}: {
+  filterProjectId?: string;
+} = {}) {
   const { state, addTask, updateTask, deleteTask } = useDashboard();
   const [isCreating, setIsCreating] = useState(false);
   
@@ -30,6 +34,7 @@ export default function TaskManager() {
   
   const currentTasks = state.tasks
     .filter((t) => t.periodId === currentPeriodId)
+    .filter((t) => (filterProjectId ? t.projectId === filterProjectId : true))
     .sort((a, b) => {
       if (sortBy === 'deadline-asc') {
         if (!a.deadline && !b.deadline) return 0;
@@ -69,7 +74,7 @@ export default function TaskManager() {
     const task: Task = {
       id: crypto.randomUUID(),
       periodId: currentPeriodId,
-      projectId: newTask.projectId || undefined,
+      projectId: filterProjectId || newTask.projectId || undefined,
       goalId: newTask.goalId || undefined,
       title: newTask.title,
       notes: newTask.notes || undefined,

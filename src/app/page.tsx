@@ -1,16 +1,29 @@
 'use client';
 
+import React, { useState } from 'react';
 import { useDashboard } from "@/store/DashboardContext";
 import PeriodManager from "@/components/PeriodManager";
 import GoalManager from "@/components/GoalManager";
 import NonGoalManager from "@/components/NonGoalManager";
 import ProjectManager from "@/components/ProjectManager";
 import TaskManager from "@/components/TaskManager";
+import GoalDetail from "@/components/GoalDetail";
+import ProjectDetail from "@/components/ProjectDetail";
 import { LayoutDashboard } from "lucide-react";
+
+type ViewState = 
+  | { type: 'home' }
+  | { type: 'goal', id: string }
+  | { type: 'project', id: string };
 
 export default function Home() {
   const { state } = useDashboard();
+  const [view, setView] = useState<ViewState>({ type: 'home' });
   const currentPeriod = state.periods.find(p => p.id === state.currentPeriodId);
+
+  const navigateToGoal = (id: string) => setView({ type: 'goal', id });
+  const navigateToProject = (id: string) => setView({ type: 'project', id });
+  const navigateHome = () => setView({ type: 'home' });
 
   return (
     <main className="min-h-screen bg-neutral-50/50 dark:bg-neutral-950 p-4 sm:p-8 lg:p-12">
@@ -58,18 +71,34 @@ export default function Home() {
           <div className="max-w-2xl mx-auto">
             <PeriodManager />
           </div>
+        ) : view.type === 'goal' ? (
+          <div className="max-w-4xl mx-auto">
+            <GoalDetail goalId={view.id} onBack={navigateHome} onProjectClick={navigateToProject} />
+          </div>
+        ) : view.type === 'project' ? (
+          <div className="max-w-4xl mx-auto">
+            <ProjectDetail projectId={view.id} onBack={() => {
+              // Try to go back to goal if this project has one, otherwise home
+              const project = state.projects.find(p => p.id === view.id);
+              if (project && project.goalId) {
+                setView({ type: 'goal', id: project.goalId });
+              } else {
+                navigateHome();
+              }
+            }} />
+          </div>
         ) : (
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
             
             {/* Left Column (Main Focus: Execution) */}
             <div className="xl:col-span-8 space-y-8">
               <TaskManager />
-              <ProjectManager />
+              <ProjectManager onProjectClick={navigateToProject} />
             </div>
 
             {/* Right Column (Sidebar: Direction) */}
             <div className="xl:col-span-4 space-y-8">
-              <GoalManager />
+              <GoalManager onGoalClick={navigateToGoal} />
               <NonGoalManager />
               
               {/* Period Switcher placed in sidebar for context switching */}

@@ -5,7 +5,7 @@ import { useDashboard } from '@/store/DashboardContext';
 import { Goal, GoalPriority, EntityStatus } from '@/types';
 import { Target, Plus, Trash2, Edit2, Check, ArrowUpDown } from 'lucide-react';
 
-export default function GoalManager() {
+export default function GoalManager({ onGoalClick }: { onGoalClick?: (id: string) => void } = {}) {
   const { state, addGoal, updateGoal, deleteGoal } = useDashboard();
   const [isCreating, setIsCreating] = useState(false);
   
@@ -272,7 +272,10 @@ export default function GoalManager() {
                 key={goal.id}
                 onMouseEnter={() => setHoveredGoalId(goal.id)}
                 onMouseLeave={() => setHoveredGoalId(null)}
+                onClick={() => onGoalClick?.(goal.id)}
                 className={`flex flex-col sm:flex-row xl:flex-col sm:items-start gap-4 p-4 rounded-lg border transition-colors ${
+                  onGoalClick ? 'cursor-pointer ' : ''
+                }${
                   isDone
                     ? 'border-neutral-100 dark:border-neutral-800/50 bg-neutral-50/50 dark:bg-neutral-900/50'
                     : 'border-neutral-200 dark:border-neutral-800 hover:border-indigo-300 dark:hover:border-indigo-700'
@@ -312,6 +315,7 @@ export default function GoalManager() {
                 <div className="shrink-0 flex items-center gap-3 mt-3 sm:mt-0">
                   <select
                     value={goal.status}
+                    onClick={(e) => e.stopPropagation()}
                     onChange={(e) => updateGoal(goal.id, { status: e.target.value as EntityStatus })}
                     className={`text-xs font-semibold rounded-md px-2 py-1.5 border outline-none cursor-pointer ${
                       goal.status === 'done' ? 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400' :
@@ -326,14 +330,14 @@ export default function GoalManager() {
 
                   <div className={`flex items-center gap-1 transition-opacity duration-200 ${hoveredGoalId === goal.id ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
                     <button
-                      onClick={() => startEditing(goal)}
+                      onClick={(e) => { e.stopPropagation(); startEditing(goal); }}
                       className="p-1.5 text-neutral-400 hover:text-indigo-500 transition-colors rounded-md hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
                       title="Edit"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => deleteGoal(goal.id)}
+                      onClick={(e) => { e.stopPropagation(); deleteGoal(goal.id); }}
                       className="p-1.5 text-neutral-400 hover:text-red-500 transition-colors rounded-md hover:bg-red-50 dark:hover:bg-red-900/20"
                       title="Delete"
                     >

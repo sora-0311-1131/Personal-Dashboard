@@ -5,7 +5,13 @@ import { useDashboard } from '@/store/DashboardContext';
 import { Project, ProjectPriority, ProjectStatus } from '@/types';
 import { Folder, Plus, Trash2, ArrowUpDown, Edit2, X, Check } from 'lucide-react';
 
-export default function ProjectManager() {
+export default function ProjectManager({
+  filterGoalId,
+  onProjectClick,
+}: {
+  filterGoalId?: string;
+  onProjectClick?: (id: string) => void;
+} = {}) {
   const { state, addProject, updateProject, deleteProject } = useDashboard();
   const [isCreating, setIsCreating] = useState(false);
   
@@ -28,6 +34,7 @@ export default function ProjectManager() {
   
   const currentProjects = state.projects
     .filter((p) => p.periodId === currentPeriodId)
+    .filter((p) => (filterGoalId ? p.goalId === filterGoalId : true))
     .sort((a, b) => {
       if (sortBy === 'deadline-asc') {
         if (!a.deadline && !b.deadline) return 0;
@@ -67,7 +74,7 @@ export default function ProjectManager() {
     const project: Project = {
       id: crypto.randomUUID(),
       periodId: currentPeriodId,
-      goalId: newProject.goalId || undefined,
+      goalId: filterGoalId || newProject.goalId || undefined,
       title: newProject.title,
       notes: newProject.notes || undefined,
       deadline: newProject.deadline || undefined,
@@ -306,7 +313,10 @@ export default function ProjectManager() {
                 key={project.id}
                 onMouseEnter={() => setHoveredProjectId(project.id)}
                 onMouseLeave={() => setHoveredProjectId(null)}
+                onClick={() => onProjectClick?.(project.id)}
                 className={`flex flex-col sm:flex-row sm:items-start gap-4 p-4 rounded-lg border transition-colors ${
+                  onProjectClick ? 'cursor-pointer ' : ''
+                }${
                   isDone
                     ? 'border-neutral-100 dark:border-neutral-800/50 bg-neutral-50/50 dark:bg-neutral-900/50'
                     : 'border-neutral-200 dark:border-neutral-800 hover:border-amber-300 dark:hover:border-amber-700'
@@ -352,6 +362,7 @@ export default function ProjectManager() {
                 <div className="shrink-0 flex items-center gap-3 mt-3 sm:mt-0">
                   <select
                     value={project.status}
+                    onClick={(e) => e.stopPropagation()}
                     onChange={(e) => updateProject(project.id, { status: e.target.value as ProjectStatus })}
                     className={`text-xs font-semibold rounded-md px-2 py-1.5 border outline-none cursor-pointer ${
                       project.status === 'done' ? 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400' :
@@ -368,14 +379,14 @@ export default function ProjectManager() {
 
                   <div className={`flex items-center gap-1 transition-opacity duration-200 ${hoveredProjectId === project.id ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
                     <button
-                      onClick={() => startEditing(project)}
+                      onClick={(e) => { e.stopPropagation(); startEditing(project); }}
                       className="p-1.5 text-neutral-400 hover:text-blue-500 transition-colors rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20"
                       title="編集"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => deleteProject(project.id)}
+                      onClick={(e) => { e.stopPropagation(); deleteProject(project.id); }}
                       className="p-1.5 text-neutral-400 hover:text-red-500 transition-colors rounded-md hover:bg-red-50 dark:hover:bg-red-900/20"
                       title="削除"
                     >
