@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useDashboard } from '@/store/DashboardContext';
 import { Project, ProjectPriority, ProjectStatus } from '@/types';
-import { Folder, Plus, Trash2, ArrowUpDown, Edit2, X, Check } from 'lucide-react';
+import { Folder, Plus, Trash2, ArrowUpDown, Edit2, X, Check, Eye, EyeOff } from 'lucide-react';
 
 export default function ProjectManager({
   filterGoalId,
@@ -28,13 +28,16 @@ export default function ProjectManager({
   }>({ title: '', goalId: '', priority: '' as any, deadline: '', notes: '' });
 
   const [sortBy, setSortBy] = useState<'deadline-asc' | 'priority-desc' | 'status'>('deadline-asc');
+  const [showDone, setShowDone] = useState(false);
 
   const currentPeriodId = state.currentPeriodId;
   const currentGoals = state.goals.filter((g) => g.periodId === currentPeriodId);
+  const currentTasks = state.tasks.filter((t) => t.periodId === currentPeriodId);
   
   const currentProjects = state.projects
     .filter((p) => p.periodId === currentPeriodId)
     .filter((p) => (filterGoalId ? p.goalId === filterGoalId : true))
+    .filter((p) => showDone || p.status !== 'done')
     .sort((a, b) => {
       if (sortBy === 'deadline-asc') {
         if (!a.deadline && !b.deadline) return 0;
@@ -113,6 +116,18 @@ export default function ProjectManager({
           Projects
         </h2>
         <div className="flex flex-wrap items-center gap-4">
+          <button
+            onClick={() => setShowDone(!showDone)}
+            className={`text-sm flex items-center gap-1 font-medium px-3 py-1.5 rounded-md transition-colors ${
+              showDone
+                ? 'bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300 hover:bg-neutral-300 dark:hover:bg-neutral-600'
+                : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+            }`}
+            title={showDone ? "完了済みの項目を非表示" : "完了済みの項目を表示"}
+          >
+            {showDone ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            <span className="hidden sm:inline">{showDone ? 'Doneを隠す' : 'Doneを表示'}</span>
+          </button>
           <div className="flex items-center gap-2 text-sm text-neutral-500 bg-neutral-50 dark:bg-neutral-800/50 px-2 py-1.5 rounded-md border border-neutral-200 dark:border-neutral-700">
             <ArrowUpDown className="w-4 h-4" />
             <select
@@ -229,6 +244,10 @@ export default function ProjectManager({
             const isDone = project.status === 'done';
             const goal = currentGoals.find(g => g.id === project.goalId);
             const isEditing = editingProjectId === project.id;
+            
+            const projectTasks = currentTasks.filter(t => t.projectId === project.id);
+            const completedTasksCount = projectTasks.filter(t => t.status === 'done').length;
+            const totalTasksCount = projectTasks.length;
 
             if (isEditing) {
               return (
@@ -343,6 +362,18 @@ export default function ProjectManager({
                     {project.priority === 'P1' && <span className="inline-block ml-2 align-middle text-[10px] font-bold px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border border-orange-200 dark:border-orange-800/50">P1: Medium</span>}
                     {project.priority === 'P2' && <span className="inline-block ml-2 align-middle text-[10px] font-bold px-1.5 py-0.5 rounded bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800/50">P2: Low</span>}
                   </div>
+
+                  {totalTasksCount > 0 && (
+                    <div className="mt-1.5 text-xs text-neutral-500 font-medium flex items-center gap-2">
+                      <div className="w-16 h-1.5 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full ${completedTasksCount === totalTasksCount ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                          style={{ width: `${(completedTasksCount / totalTasksCount) * 100}%` }}
+                        />
+                      </div>
+                      Tasks {completedTasksCount}/{totalTasksCount}
+                    </div>
+                  )}
                   
                   {/* Notes below title */}
                   {project.notes && (

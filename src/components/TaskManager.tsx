@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useDashboard } from '@/store/DashboardContext';
 import { Task, TaskPriority, TaskStatus } from '@/types';
-import { CheckSquare, Plus, Trash2, ArrowUpDown, Edit2, X, Check } from 'lucide-react';
+import { CheckSquare, Plus, Trash2, ArrowUpDown, Edit2, X, Check, Eye, EyeOff } from 'lucide-react';
 
 export default function TaskManager({
   filterProjectId,
@@ -27,6 +27,7 @@ export default function TaskManager({
   }>({ title: '', projectId: '', goalId: '', priority: '' as any, deadline: '', notes: '' });
 
   const [sortBy, setSortBy] = useState<'deadline-asc' | 'priority-desc' | 'status'>('deadline-asc');
+  const [showDone, setShowDone] = useState(false);
 
   const currentPeriodId = state.currentPeriodId;
   const currentProjects = state.projects.filter((p) => p.periodId === currentPeriodId);
@@ -34,7 +35,8 @@ export default function TaskManager({
   
   const currentTasks = state.tasks
     .filter((t) => t.periodId === currentPeriodId)
-    .filter((t) => (filterProjectId ? t.projectId === filterProjectId : true))
+    .filter((t) => (filterProjectId ? t.projectId === filterProjectId : !t.projectId))
+    .filter((t) => showDone || t.status !== 'done')
     .sort((a, b) => {
       if (sortBy === 'deadline-asc') {
         if (!a.deadline && !b.deadline) return 0;
@@ -114,6 +116,18 @@ export default function TaskManager({
           Tasks
         </h2>
         <div className="flex flex-wrap items-center gap-4">
+          <button
+            onClick={() => setShowDone(!showDone)}
+            className={`text-sm flex items-center gap-1 font-medium px-3 py-1.5 rounded-md transition-colors ${
+              showDone
+                ? 'bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300 hover:bg-neutral-300 dark:hover:bg-neutral-600'
+                : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
+            }`}
+            title={showDone ? "完了済みの項目を非表示" : "完了済みの項目を表示"}
+          >
+            {showDone ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            <span className="hidden sm:inline">{showDone ? 'Doneを隠す' : 'Doneを表示'}</span>
+          </button>
           <div className="flex items-center gap-2 text-sm text-neutral-500 bg-neutral-50 dark:bg-neutral-800/50 px-2 py-1.5 rounded-md border border-neutral-200 dark:border-neutral-700">
             <ArrowUpDown className="w-4 h-4" />
             <select
@@ -379,9 +393,9 @@ export default function TaskManager({
                     </div>
                   )}
 
-                  {(project || goal) && !isDone && (
+                  {((project && !filterProjectId) || goal) && !isDone && (
                     <div className="flex flex-wrap gap-2 mt-3 text-xs text-neutral-500">
-                      {project && <span className="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-1.5 py-0.5 rounded">プロジェクト: {project.title}</span>}
+                      {project && !filterProjectId && <span className="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-1.5 py-0.5 rounded">プロジェクト: {project.title}</span>}
                       {goal && <span className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 px-1.5 py-0.5 rounded">目標: {goal.title}</span>}
                     </div>
                   )}

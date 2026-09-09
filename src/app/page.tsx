@@ -80,8 +80,10 @@ export default function Home() {
             <ProjectDetail projectId={view.id} onBack={() => {
               // Try to go back to goal if this project has one, otherwise home
               const project = state.projects.find(p => p.id === view.id);
-              if (project && project.goalId) {
-                setView({ type: 'goal', id: project.goalId });
+              const linkedGoal = project?.goalId ? state.goals.find(g => g.id === project.goalId) : null;
+              
+              if (linkedGoal) {
+                setView({ type: 'goal', id: linkedGoal.id });
               } else {
                 navigateHome();
               }
