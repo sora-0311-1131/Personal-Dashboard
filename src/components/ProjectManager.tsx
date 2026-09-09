@@ -36,7 +36,7 @@ export default function ProjectManager({
   
   const currentProjects = state.projects
     .filter((p) => p.periodId === currentPeriodId)
-    .filter((p) => (filterGoalId ? p.goalId === filterGoalId : true))
+    .filter((p) => (filterGoalId ? p.goalId === filterGoalId : !p.goalId))
     .filter((p) => showDone || p.status !== 'done')
     .sort((a, b) => {
       if (sortBy === 'deadline-asc') {
@@ -382,7 +382,7 @@ export default function ProjectManager({
                     </div>
                   )}
 
-                  {goal && !isDone && (
+                  {goal && !filterGoalId && !isDone && (
                     <div className="flex flex-wrap gap-2 mt-3 text-xs text-neutral-500">
                       <span className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 px-1.5 py-0.5 rounded">目標: {goal.title}</span>
                     </div>

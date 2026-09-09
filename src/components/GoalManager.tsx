@@ -23,6 +23,7 @@ export default function GoalManager({ onGoalClick }: { onGoalClick?: (id: string
   const [showDone, setShowDone] = useState(false);
 
   const currentPeriodId = state.currentPeriodId;
+  const currentProjects = state.projects.filter((p) => p.periodId === currentPeriodId);
   const currentGoals = state.goals
     .filter((g) => g.periodId === currentPeriodId)
     .filter((g) => showDone || g.status !== 'done')
@@ -213,6 +214,10 @@ export default function GoalManager({ onGoalClick }: { onGoalClick?: (id: string
           {currentGoals.map((goal) => {
             const isEditing = editingGoalId === goal.id;
             const isDone = goal.status === 'done';
+            
+            const goalProjects = currentProjects.filter(p => p.goalId === goal.id);
+            const completedProjectsCount = goalProjects.filter(p => p.status === 'done').length;
+            const totalProjectsCount = goalProjects.length;
 
             if (isEditing) {
               return (
@@ -316,6 +321,18 @@ export default function GoalManager({ onGoalClick }: { onGoalClick?: (id: string
                     {goal.priority === 'P1' && <span className="inline-block ml-2 align-middle text-[10px] font-bold px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border border-orange-200 dark:border-orange-800/50">P1: Medium</span>}
                     {goal.priority === 'P2' && <span className="inline-block ml-2 align-middle text-[10px] font-bold px-1.5 py-0.5 rounded bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800/50">P2: Low</span>}
                   </div>
+
+                  {totalProjectsCount > 0 && (
+                    <div className="mt-1.5 text-xs text-neutral-500 font-medium flex items-center gap-2">
+                      <div className="w-16 h-1.5 bg-neutral-200 dark:bg-neutral-800 rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full ${completedProjectsCount === totalProjectsCount ? 'bg-indigo-500' : 'bg-blue-500'}`}
+                          style={{ width: `${(completedProjectsCount / totalProjectsCount) * 100}%` }}
+                        />
+                      </div>
+                      Projects {completedProjectsCount}/{totalProjectsCount}
+                    </div>
+                  )}
                   
                   {/* Notes below title */}
                   {goal.notes && (
