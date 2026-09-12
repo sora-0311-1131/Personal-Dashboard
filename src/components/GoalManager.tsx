@@ -98,7 +98,7 @@ export default function GoalManager({ onGoalClick }: { onGoalClick?: (id: string
 
   return (
     <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-6 shadow-sm">
-      <div className="flex flex-col sm:flex-row xl:flex-col sm:items-center xl:items-start justify-between mb-6 gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
         <h2 className="text-xl font-semibold flex items-center gap-2">
           <Target className="w-5 h-5 text-indigo-500" />
           Goals
@@ -292,7 +292,7 @@ export default function GoalManager({ onGoalClick }: { onGoalClick?: (id: string
                 onMouseEnter={() => setHoveredGoalId(goal.id)}
                 onMouseLeave={() => setHoveredGoalId(null)}
                 onClick={() => onGoalClick?.(goal.id)}
-                className={`flex flex-col sm:flex-row xl:flex-col sm:items-start gap-4 p-4 rounded-lg border transition-colors ${
+                className={`flex flex-col sm:flex-row sm:items-start gap-4 p-4 rounded-lg border transition-colors ${
                   onGoalClick ? 'cursor-pointer ' : ''
                 }${
                   isDone
