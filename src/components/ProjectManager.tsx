@@ -123,10 +123,10 @@ export default function ProjectManager({
                 ? 'bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300 hover:bg-neutral-300 dark:hover:bg-neutral-600'
                 : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
             }`}
-            title={showDone ? "完了済みの項目を非表示" : "完了済みの項目を表示"}
+            title={showDone ? "Hide done items" : "Show done items"}
           >
             {showDone ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            <span className="hidden sm:inline">{showDone ? 'Doneを隠す' : 'Doneを表示'}</span>
+            <span className="hidden sm:inline">{showDone ? 'Hide Done' : 'Show Done'}</span>
           </button>
           <div className="flex items-center gap-2 text-sm text-neutral-500 bg-neutral-50 dark:bg-neutral-800/50 px-2 py-1.5 rounded-md border border-neutral-200 dark:border-neutral-700">
             <ArrowUpDown className="w-4 h-4" />
@@ -135,9 +135,9 @@ export default function ProjectManager({
               onChange={(e) => setSortBy(e.target.value as any)}
               className="bg-transparent border-none outline-none cursor-pointer text-neutral-700 dark:text-neutral-300 font-medium"
             >
-              <option value="deadline-asc">期限順 (早い順)</option>
-              <option value="priority-desc">優先度順 (高→低)</option>
-              <option value="status">ステータス順</option>
+              <option value="deadline-asc">Deadline (Ascending)</option>
+              <option value="priority-desc">Priority (High to Low)</option>
+              <option value="status">Status</option>
             </select>
           </div>
           <button
@@ -145,7 +145,7 @@ export default function ProjectManager({
             className="text-sm flex items-center gap-1 text-amber-600 hover:text-amber-700 font-medium bg-amber-50 dark:bg-amber-900/20 px-3 py-1.5 rounded-md transition-colors"
           >
             <Plus className="w-4 h-4" />
-            新規作成
+            New
           </button>
         </div>
       </div>
@@ -153,11 +153,11 @@ export default function ProjectManager({
       {isCreating && (
         <form onSubmit={handleCreate} className="mb-6 bg-neutral-50 dark:bg-neutral-800/50 p-4 rounded-lg space-y-4 border border-neutral-200 dark:border-neutral-700">
           <div>
-            <label className="block text-sm font-medium mb-1">Project (タイトル)</label>
+            <label className="block text-sm font-medium mb-1">Project (Title)</label>
             <input
               type="text"
               required
-              placeholder="例: ウェブサイトのリニューアル"
+              placeholder="e.g., Website Renewal"
               className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-amber-500"
               value={newProject.title}
               onChange={e => setNewProject({ ...newProject, title: e.target.value })}
@@ -181,7 +181,7 @@ export default function ProjectManager({
                 value={newProject.priority}
                 onChange={e => setNewProject({ ...newProject, priority: e.target.value as (ProjectPriority | '') })}
               >
-                <option value="">-- 未設定 --</option>
+                <option value="">-- Unset --</option>
                 <option value="P0">P0: High</option>
                 <option value="P1">P1: Medium</option>
                 <option value="P2">P2: Low</option>
@@ -192,7 +192,7 @@ export default function ProjectManager({
           <div>
             <label className="block text-sm font-medium mb-1">Notes</label>
             <textarea
-              placeholder="メモや詳細"
+              placeholder="Notes or details"
               rows={2}
               className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-amber-500"
               value={newProject.notes}
@@ -201,13 +201,13 @@ export default function ProjectManager({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">目標に紐付ける (任意)</label>
+            <label className="block text-sm font-medium mb-1">Link to Goal (Optional)</label>
             <select
               className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-amber-500"
               value={newProject.goalId}
               onChange={e => setNewProject({ ...newProject, goalId: e.target.value })}
             >
-              <option value="">-- 紐付けなし --</option>
+              <option value="">-- None --</option>
               {currentGoals.map(g => (
                 <option key={g.id} value={g.id}>{g.title}</option>
               ))}
@@ -220,13 +220,13 @@ export default function ProjectManager({
               onClick={() => setIsCreating(false)}
               className="px-4 py-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
             >
-              キャンセル
+              Cancel
             </button>
             <button
               type="submit"
               className="px-4 py-2 text-sm font-medium bg-amber-600 text-white rounded-md hover:bg-amber-700 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-900"
             >
-              作成
+              Create
             </button>
           </div>
         </form>
@@ -235,8 +235,8 @@ export default function ProjectManager({
       {currentProjects.length === 0 && !isCreating ? (
         <div className="text-center py-10 border-2 border-dashed border-neutral-200 dark:border-neutral-800 rounded-lg flex flex-col items-center justify-center text-neutral-500">
           <Folder className="w-8 h-8 text-neutral-400 mb-3 opacity-50" />
-          <p className="font-medium text-neutral-600 dark:text-neutral-400">プロジェクトがまだありません。</p>
-          <p className="text-sm mt-1">タスクをプロジェクトにまとめましょう。</p>
+          <p className="font-medium text-neutral-600 dark:text-neutral-400">No projects yet.</p>
+          <p className="text-sm mt-1">Group your tasks into projects.</p>
         </div>
       ) : (
         <ul className="space-y-3">
@@ -253,7 +253,7 @@ export default function ProjectManager({
               return (
                 <li key={project.id} className="p-4 rounded-lg border border-blue-300 dark:border-blue-700 bg-blue-50/50 dark:bg-blue-900/10 space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1">Project (タイトル)</label>
+                    <label className="block text-sm font-medium mb-1">Project (Title)</label>
                     <input
                       type="text"
                       required
@@ -279,8 +279,8 @@ export default function ProjectManager({
                         value={editingProjectData.priority || ''}
                         onChange={e => setEditingProjectData({ ...editingProjectData, priority: (e.target.value || undefined) as ProjectPriority | undefined })}
                       >
-                        <option value="">-- 未設定 --</option>
-                <option value="P0">P0: High</option>
+                        <option value="">-- Unset --</option>
+                        <option value="P0">P0: High</option>
                         <option value="P1">P1: Medium</option>
                         <option value="P2">P2: Low</option>
                       </select>
@@ -296,13 +296,13 @@ export default function ProjectManager({
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">目標</label>
+                    <label className="block text-sm font-medium mb-1">Goal</label>
                     <select
                       className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-blue-500"
                       value={editingProjectData.goalId || ''}
                       onChange={e => setEditingProjectData({ ...editingProjectData, goalId: e.target.value || undefined })}
                     >
-                      <option value="">-- 紐付けなし --</option>
+                      <option value="">-- None --</option>
                       {currentGoals.map(g => (
                         <option key={g.id} value={g.id}>{g.title}</option>
                       ))}
@@ -313,14 +313,14 @@ export default function ProjectManager({
                       onClick={cancelEdit}
                       className="px-4 py-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
                     >
-                      キャンセル
+                      Cancel
                     </button>
                     <button
                       onClick={saveEdit}
                       className="flex items-center gap-1 px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700"
                     >
                       <Check className="w-4 h-4" />
-                      保存
+                      Save
                     </button>
                   </div>
                 </li>
@@ -348,7 +348,7 @@ export default function ProjectManager({
                       {project.deadline}
                     </div>
                   ) : (
-                    <div className="text-xs text-neutral-400 dark:text-neutral-600">未設定</div>
+                    <div className="text-xs text-neutral-400 dark:text-neutral-600">Unset</div>
                   )}
                 </div>
                 
@@ -384,7 +384,7 @@ export default function ProjectManager({
 
                   {goal && !filterGoalId && !isDone && (
                     <div className="flex flex-wrap gap-2 mt-3 text-xs text-neutral-500">
-                      <span className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 px-1.5 py-0.5 rounded">目標: {goal.title}</span>
+                      <span className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 px-1.5 py-0.5 rounded">Goal: {goal.title}</span>
                     </div>
                   )}
                 </div>
@@ -412,14 +412,14 @@ export default function ProjectManager({
                     <button
                       onClick={(e) => { e.stopPropagation(); startEditing(project); }}
                       className="p-1.5 text-neutral-400 hover:text-blue-500 transition-colors rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                      title="編集"
+                      title="Edit"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); deleteProject(project.id); }}
                       className="p-1.5 text-neutral-400 hover:text-red-500 transition-colors rounded-md hover:bg-red-50 dark:hover:bg-red-900/20"
-                      title="削除"
+                      title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

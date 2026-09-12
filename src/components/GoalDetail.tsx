@@ -37,7 +37,7 @@ export default function GoalDetail({
           className="flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300 mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          一覧に戻る
+          Back to list
         </button>
         <div className="flex items-start gap-4">
           <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl">
@@ -60,7 +60,7 @@ export default function GoalDetail({
             
             {goal.deadline && (
               <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4 font-medium">
-                期限: {goal.deadline}
+                Deadline: {goal.deadline}
               </p>
             )}
 
@@ -75,7 +75,7 @@ export default function GoalDetail({
 
       {/* Projects under this goal */}
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-neutral-700 dark:text-neutral-300 px-1">紐づくプロジェクト</h3>
+        <h3 className="text-lg font-semibold mb-4 text-neutral-700 dark:text-neutral-300 px-1">Linked Projects</h3>
         <ProjectManager filterGoalId={goal.id} onProjectClick={onProjectClick} />
       </div>
     </div>

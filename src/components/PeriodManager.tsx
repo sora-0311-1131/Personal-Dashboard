@@ -52,7 +52,7 @@ export default function PeriodManager() {
 
   const handleDelete = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    if (window.confirm('この期間を削除すると、関連する目標やタスクも削除されます。本当によろしいですか？')) {
+    if (window.confirm('Deleting this period will also delete related goals and tasks. Are you sure?')) {
       deletePeriod(id);
     }
   };

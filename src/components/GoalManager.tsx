@@ -111,10 +111,10 @@ export default function GoalManager({ onGoalClick }: { onGoalClick?: (id: string
                 ? 'bg-neutral-200 text-neutral-700 dark:bg-neutral-700 dark:text-neutral-300 hover:bg-neutral-300 dark:hover:bg-neutral-600'
                 : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700'
             }`}
-            title={showDone ? "完了済みの項目を非表示" : "完了済みの項目を表示"}
+            title={showDone ? "Hide done items" : "Show done items"}
           >
             {showDone ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            <span className="hidden sm:inline">{showDone ? 'Doneを隠す' : 'Doneを表示'}</span>
+            <span className="hidden sm:inline">{showDone ? 'Hide Done' : 'Show Done'}</span>
           </button>
           <div className="flex items-center gap-2 text-sm text-neutral-500 bg-neutral-50 dark:bg-neutral-800/50 px-2 py-1.5 rounded-md border border-neutral-200 dark:border-neutral-700">
             <ArrowUpDown className="w-4 h-4" />
@@ -123,9 +123,9 @@ export default function GoalManager({ onGoalClick }: { onGoalClick?: (id: string
               onChange={(e) => setSortBy(e.target.value as any)}
               className="bg-transparent border-none outline-none cursor-pointer text-neutral-700 dark:text-neutral-300 font-medium"
             >
-              <option value="deadline-asc">期限順 (早い順)</option>
-              <option value="priority-desc">優先度順 (高→低)</option>
-              <option value="status">ステータス順</option>
+              <option value="deadline-asc">Deadline (Ascending)</option>
+              <option value="priority-desc">Priority (High to Low)</option>
+              <option value="status">Status</option>
             </select>
           </div>
           <button
@@ -133,7 +133,7 @@ export default function GoalManager({ onGoalClick }: { onGoalClick?: (id: string
             className="text-sm flex items-center gap-1 text-indigo-600 hover:text-indigo-700 font-medium bg-indigo-50 dark:bg-indigo-900/20 px-3 py-1.5 rounded-md transition-colors"
           >
             <Plus className="w-4 h-4" />
-            新規作成
+            New
           </button>
         </div>
       </div>
@@ -169,7 +169,7 @@ export default function GoalManager({ onGoalClick }: { onGoalClick?: (id: string
                 value={newGoal.priority}
                 onChange={e => setNewGoal({ ...newGoal, priority: e.target.value as (GoalPriority | '') })}
               >
-                <option value="">-- 未設定 --</option>
+                <option value="">-- Unset --</option>
                 <option value="P0">P0: High</option>
                 <option value="P1">P1: Medium</option>
                 <option value="P2">P2: Low</option>
@@ -250,7 +250,7 @@ export default function GoalManager({ onGoalClick }: { onGoalClick?: (id: string
                         value={editingGoalData.priority || ''}
                         onChange={e => setEditingGoalData({ ...editingGoalData, priority: (e.target.value || undefined) as GoalPriority | undefined })}
                       >
-                        <option value="">-- 未設定 --</option>
+                        <option value="">-- Unset --</option>
                 <option value="P0">P0: High</option>
                         <option value="P1">P1: Medium</option>
                         <option value="P2">P2: Low</option>
@@ -307,7 +307,7 @@ export default function GoalManager({ onGoalClick }: { onGoalClick?: (id: string
                       {goal.deadline}
                     </div>
                   ) : (
-                    <div className="text-xs text-neutral-400 dark:text-neutral-600">未設定</div>
+                    <div className="text-xs text-neutral-400 dark:text-neutral-600">Unset</div>
                   )}
                 </div>
                 

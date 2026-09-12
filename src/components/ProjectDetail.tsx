@@ -36,7 +36,7 @@ export default function ProjectDetail({
           className="flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300 mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          戻る
+          Back
         </button>
         <div className="flex items-start gap-4">
           <div className="p-3 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-xl">
@@ -60,7 +60,7 @@ export default function ProjectDetail({
             
             {project.deadline && (
               <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4 font-medium">
-                期限: {project.deadline}
+                Deadline: {project.deadline}
               </p>
             )}
 
@@ -72,7 +72,7 @@ export default function ProjectDetail({
 
             {goal && (
               <div className="flex flex-wrap gap-2 mt-4 text-xs text-neutral-500">
-                <span className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 px-2 py-1 rounded-md font-medium border border-indigo-200 dark:border-indigo-800/50">目標: {goal.title}</span>
+                <span className="bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 px-2 py-1 rounded-md font-medium border border-indigo-200 dark:border-indigo-800/50">Goal: {goal.title}</span>
               </div>
             )}
           </div>
@@ -81,7 +81,7 @@ export default function ProjectDetail({
 
       {/* Tasks under this project */}
       <div>
-        <h3 className="text-lg font-semibold mb-4 text-neutral-700 dark:text-neutral-300 px-1">紐づくタスク</h3>
+        <h3 className="text-lg font-semibold mb-4 text-neutral-700 dark:text-neutral-300 px-1">Linked Tasks</h3>
         <TaskManager filterProjectId={project.id} />
       </div>
     </div>
