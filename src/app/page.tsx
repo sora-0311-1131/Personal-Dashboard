@@ -92,15 +92,15 @@ export default function Home() {
         ) : (
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
             
-            {/* Left Column (Main Focus: Execution) */}
+            {/* Left Column (Main Focus: Tasks, Projects, Goals) */}
             <div className="xl:col-span-8 space-y-8">
               <TaskManager />
               <ProjectManager onProjectClick={navigateToProject} />
+              <GoalManager onGoalClick={navigateToGoal} />
             </div>
 
-            {/* Right Column (Sidebar: Direction) */}
+            {/* Right Column (Sidebar: Non-Goals, Periods) */}
             <div className="xl:col-span-4 space-y-8">
-              <GoalManager onGoalClick={navigateToGoal} />
               <NonGoalManager />
               
               {/* Period Switcher placed in sidebar for context switching */}
