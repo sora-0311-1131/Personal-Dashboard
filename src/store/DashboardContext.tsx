@@ -65,25 +65,36 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     
     const initializeData = async () => {
       try {
-        const [
-          { data: periodsData, error: pErr },
-          { data: goalsData, error: gErr },
-          { data: nonGoalsData, error: ngErr },
-          { data: projectsData, error: prjErr },
-          { data: tasksData, error: tErr }
-        ] = await Promise.all([
-          supabase.from('periods').select('*'),
-          supabase.from('goals').select('*'),
-          supabase.from('non_goals').select('*'),
-          supabase.from('projects').select('*'),
-          supabase.from('tasks').select('*')
-        ]);
+        // Fetch individually to identify which one fails
+        const { data: periodsData, error: pErr } = await supabase.from('periods').select('*');
+        if (pErr) {
+          console.error('[Supabase Error] periods table fetch failed', { message: pErr.message, details: pErr.details, hint: pErr.hint, code: pErr.code });
+          throw pErr;
+        }
 
-        if (pErr) throw pErr;
-        if (gErr) throw gErr;
-        if (ngErr) throw ngErr;
-        if (prjErr) throw prjErr;
-        if (tErr) throw tErr;
+        const { data: goalsData, error: gErr } = await supabase.from('goals').select('*');
+        if (gErr) {
+          console.error('[Supabase Error] goals table fetch failed', { message: gErr.message, details: gErr.details, hint: gErr.hint, code: gErr.code });
+          throw gErr;
+        }
+
+        const { data: nonGoalsData, error: ngErr } = await supabase.from('non_goals').select('*');
+        if (ngErr) {
+          console.error('[Supabase Error] non_goals table fetch failed', { message: ngErr.message, details: ngErr.details, hint: ngErr.hint, code: ngErr.code });
+          throw ngErr;
+        }
+
+        const { data: projectsData, error: prjErr } = await supabase.from('projects').select('*');
+        if (prjErr) {
+          console.error('[Supabase Error] projects table fetch failed', { message: prjErr.message, details: prjErr.details, hint: prjErr.hint, code: prjErr.code });
+          throw prjErr;
+        }
+
+        const { data: tasksData, error: tErr } = await supabase.from('tasks').select('*');
+        if (tErr) {
+          console.error('[Supabase Error] tasks table fetch failed', { message: tErr.message, details: tErr.details, hint: tErr.hint, code: tErr.code });
+          throw tErr;
+        }
 
         const fetchedPeriods = (periodsData || []).map(fromDbPeriod);
         const fetchedGoals = (goalsData || []).map(fromDbGoal);
@@ -105,23 +116,38 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             // Insert in order of constraints to respect Foreign Keys
             if (localData.periods && localData.periods.length > 0) {
               const { error } = await supabase.from('periods').insert(localData.periods.map(toDbPeriod));
-              if (error) throw error;
+              if (error) {
+                console.error('[Migration Error] periods insert failed', { message: error.message, code: error.code, details: error.details, hint: error.hint });
+                throw error;
+              }
             }
             if (localData.goals && localData.goals.length > 0) {
               const { error } = await supabase.from('goals').insert(localData.goals.map(toDbGoal));
-              if (error) throw error;
+              if (error) {
+                console.error('[Migration Error] goals insert failed', { message: error.message, code: error.code, details: error.details, hint: error.hint });
+                throw error;
+              }
             }
             if (localData.nonGoals && localData.nonGoals.length > 0) {
               const { error } = await supabase.from('non_goals').insert(localData.nonGoals.map(toDbNonGoal));
-              if (error) throw error;
+              if (error) {
+                console.error('[Migration Error] non_goals insert failed', { message: error.message, code: error.code, details: error.details, hint: error.hint });
+                throw error;
+              }
             }
             if (localData.projects && localData.projects.length > 0) {
               const { error } = await supabase.from('projects').insert(localData.projects.map(toDbProject));
-              if (error) throw error;
+              if (error) {
+                console.error('[Migration Error] projects insert failed', { message: error.message, code: error.code, details: error.details, hint: error.hint });
+                throw error;
+              }
             }
             if (localData.tasks && localData.tasks.length > 0) {
               const { error } = await supabase.from('tasks').insert(localData.tasks.map(toDbTask));
-              if (error) throw error;
+              if (error) {
+                console.error('[Migration Error] tasks insert failed', { message: error.message, code: error.code, details: error.details, hint: error.hint });
+                throw error;
+              }
             }
             
             console.log('Migration successful. Clearing local storage.');
@@ -139,8 +165,13 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
               setIsLoaded(true);
             }
             return;
-          } catch (migrationErr) {
-            console.error('Migration failed, local storage intact:', migrationErr);
+          } catch (migrationErr: any) {
+            console.error('Migration failed, local storage intact:', {
+              message: migrationErr?.message,
+              code: migrationErr?.code,
+              details: migrationErr?.details,
+              hint: migrationErr?.hint
+            });
             // Fallthrough to normal load logic (empty DB) on failure
           }
         }
