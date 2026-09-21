@@ -54,6 +54,23 @@ const DashboardContext = createContext<DashboardContextType | undefined>(undefin
 
 const LOCAL_STORAGE_KEY = 'personal-dashboard-data';
 
+const getDefaultPeriodId = (periods: Period[]): string | null => {
+  if (periods.length === 0) return null;
+  
+  const d = new Date();
+  const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  
+  const activePeriods = periods.filter(p => p.startDate <= today && p.endDate >= today);
+  
+  if (activePeriods.length > 0) {
+    // Sort by id ascending if multiple periods encompass today
+    activePeriods.sort((a, b) => a.id.localeCompare(b.id));
+    return activePeriods[0].id;
+  }
+  
+  return periods[0].id;
+};
+
 export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, setState] = useState<DashboardState>(initialState);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -184,7 +201,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             nonGoals: fetchedNonGoals,
             projects: fetchedProjects,
             tasks: fetchedTasks,
-            currentPeriodId: fetchedPeriods.length > 0 ? fetchedPeriods[0].id : null,
+            currentPeriodId: getDefaultPeriodId(fetchedPeriods),
           });
           setIsLoaded(true);
         }
@@ -256,7 +273,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const remainingPeriods = prev.periods.filter((p) => p.id !== id);
         let newCurrentPeriodId = prev.currentPeriodId;
         if (prev.currentPeriodId === id) {
-          newCurrentPeriodId = remainingPeriods.length > 0 ? remainingPeriods[0].id : null;
+          newCurrentPeriodId = getDefaultPeriodId(remainingPeriods);
         }
         return {
           ...prev,
