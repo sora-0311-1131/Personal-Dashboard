@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useDashboard } from '@/store/DashboardContext';
 import { NonGoal } from '@/types';
 import { ShieldAlert, Plus, Trash2, Edit2, Check } from 'lucide-react';
+import { Linkify } from '@/components/Linkify';
 
 export default function NonGoalManager() {
   const { state, addNonGoal, updateNonGoal, deleteNonGoal } = useDashboard();
@@ -172,7 +173,7 @@ export default function NonGoalManager() {
               <div className="flex-1 flex flex-col min-w-0">
                 <span className="text-sm font-medium">{ng.title}</span>
                 {ng.notes && (
-                  <span className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 whitespace-pre-wrap">{ng.notes}</span>
+                  <span className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 whitespace-pre-wrap"><Linkify>{ng.notes}</Linkify></span>
                 )}
               </div>
               <div className={`flex items-center gap-1 transition-opacity duration-200 ml-2 shrink-0 ${hoveredNonGoalId === ng.id ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>

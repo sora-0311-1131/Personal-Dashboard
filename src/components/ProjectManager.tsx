@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useDashboard } from '@/store/DashboardContext';
 import { Project, ProjectPriority, ProjectStatus } from '@/types';
 import { Folder, Plus, Trash2, ArrowUpDown, Edit2, X, Check, Eye, EyeOff } from 'lucide-react';
+import { Linkify } from '@/components/Linkify';
 
 export default function ProjectManager({
   filterGoalId,
@@ -378,7 +379,7 @@ export default function ProjectManager({
                   {/* Notes below title */}
                   {project.notes && (
                     <div className={`text-sm mt-1.5 whitespace-pre-wrap ${isDone ? 'text-neutral-400' : 'text-neutral-600 dark:text-neutral-400'}`}>
-                      {project.notes}
+                      <Linkify>{project.notes}</Linkify>
                     </div>
                   )}
 

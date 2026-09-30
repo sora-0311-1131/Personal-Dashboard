@@ -4,6 +4,7 @@ import React from 'react';
 import { useDashboard } from '@/store/DashboardContext';
 import ProjectManager from './ProjectManager';
 import { Target, ArrowLeft } from 'lucide-react';
+import { Linkify } from '@/components/Linkify';
 
 export default function GoalDetail({
   goalId,
@@ -66,7 +67,7 @@ export default function GoalDetail({
 
             {goal.notes && (
               <div className="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap bg-neutral-50 dark:bg-neutral-800/50 p-4 rounded-lg border border-neutral-200 dark:border-neutral-700 mt-4">
-                {goal.notes}
+                <Linkify>{goal.notes}</Linkify>
               </div>
             )}
           </div>

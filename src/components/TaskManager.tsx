@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useDashboard } from '@/store/DashboardContext';
 import { Task, TaskPriority, TaskStatus } from '@/types';
 import { CheckSquare, Plus, Trash2, ArrowUpDown, Edit2, X, Check, Eye, EyeOff } from 'lucide-react';
+import { Linkify } from '@/components/Linkify';
 
 export default function TaskManager({
   filterProjectId,
@@ -389,7 +390,7 @@ export default function TaskManager({
                   {/* Notes below title */}
                   {task.notes && (
                     <div className={`text-sm mt-1.5 whitespace-pre-wrap ${isDone ? 'text-neutral-400' : 'text-neutral-600 dark:text-neutral-400'}`}>
-                      {task.notes}
+                      <Linkify>{task.notes}</Linkify>
                     </div>
                   )}
 

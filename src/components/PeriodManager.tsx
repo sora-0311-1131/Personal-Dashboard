@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useDashboard } from '@/store/DashboardContext';
 import { Period } from '@/types';
 import { Plus, Calendar as CalendarIcon, Check, Edit2, Trash2 } from 'lucide-react';
+import { Linkify } from '@/components/Linkify';
 
 export default function PeriodManager() {
   const { state, addPeriod, updatePeriod, deletePeriod, setCurrentPeriod } = useDashboard();
@@ -233,7 +234,7 @@ export default function PeriodManager() {
                     </p>
                     {period.notes && (
                       <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1 whitespace-pre-wrap">
-                        {period.notes}
+                        <Linkify>{period.notes}</Linkify>
                       </p>
                     )}
                   </div>

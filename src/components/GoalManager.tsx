@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useDashboard } from '@/store/DashboardContext';
 import { Goal, GoalPriority, EntityStatus } from '@/types';
 import { Target, Plus, Trash2, Edit2, Check, ArrowUpDown, Eye, EyeOff } from 'lucide-react';
+import { Linkify } from '@/components/Linkify';
 
 export default function GoalManager({ onGoalClick }: { onGoalClick?: (id: string) => void } = {}) {
   const { state, addGoal, updateGoal, deleteGoal } = useDashboard();
@@ -337,7 +338,7 @@ export default function GoalManager({ onGoalClick }: { onGoalClick?: (id: string
                   {/* Notes below title */}
                   {goal.notes && (
                     <div className={`text-sm mt-1.5 whitespace-pre-wrap ${isDone ? 'text-neutral-400' : 'text-neutral-600 dark:text-neutral-400'}`}>
-                      {goal.notes}
+                      <Linkify>{goal.notes}</Linkify>
                     </div>
                   )}
                 </div>
