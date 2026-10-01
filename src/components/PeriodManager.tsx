@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useDashboard } from '@/store/DashboardContext';
 import { Period } from '@/types';
-import { Plus, Calendar as CalendarIcon, Check, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Calendar as CalendarIcon, Check, Edit2, Trash2, ChevronDown } from 'lucide-react';
 import { Linkify } from '@/components/Linkify';
 
 export default function PeriodManager() {
@@ -58,7 +58,129 @@ export default function PeriodManager() {
     }
   };
 
-  const currentPeriod = state.periods.find(p => p.id === state.currentPeriodId);
+  const today = new Date().toISOString().split('T')[0];
+
+  const ongoingPeriods = state.periods.filter(p => p.startDate <= today && p.endDate >= today);
+  const upcomingPeriods = state.periods.filter(p => p.startDate > today);
+  const completedPeriods = state.periods.filter(p => p.endDate < today);
+
+  const renderPeriod = (period: Period) => {
+    const isEditing = editingPeriodId === period.id;
+
+    if (isEditing) {
+      return (
+        <div key={period.id} className="p-4 rounded-lg border border-blue-300 dark:border-blue-700 bg-blue-50/50 dark:bg-blue-900/10 space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Period</label>
+            <input
+              type="text"
+              required
+              className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-blue-500"
+              value={editingPeriodData.name || ''}
+              onChange={e => setEditingPeriodData({ ...editingPeriodData, name: e.target.value })}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Start Date</label>
+              <input
+                type="date"
+                required
+                className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-blue-500"
+                value={editingPeriodData.startDate || ''}
+                onChange={e => setEditingPeriodData({ ...editingPeriodData, startDate: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">End Date</label>
+              <input
+                type="date"
+                required
+                className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-blue-500"
+                value={editingPeriodData.endDate || ''}
+                onChange={e => setEditingPeriodData({ ...editingPeriodData, endDate: e.target.value })}
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Notes</label>
+            <textarea
+              rows={2}
+              className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-blue-500"
+              value={editingPeriodData.notes || ''}
+              onChange={e => setEditingPeriodData({ ...editingPeriodData, notes: e.target.value })}
+            />
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <button
+              onClick={cancelEdit}
+              className="px-4 py-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={saveEdit}
+              className="flex items-center gap-1 px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              <Check className="w-4 h-4" />
+              Save
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    const isCurrent = period.id === state.currentPeriodId;
+    return (
+      <div
+        key={period.id}
+        onClick={() => setCurrentPeriod(period.id)}
+        onMouseEnter={() => setHoveredPeriodId(period.id)}
+        onMouseLeave={() => setHoveredPeriodId(null)}
+        className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+          isCurrent 
+            ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10 dark:border-blue-500/50' 
+            : 'border-neutral-200 dark:border-neutral-800 hover:border-blue-300 dark:hover:border-blue-700'
+        }`}
+      >
+        <div className="flex justify-between items-start">
+          <div className="flex-1 min-w-0 pr-4">
+            <h3 className={`font-medium ${isCurrent ? 'text-blue-700 dark:text-blue-400' : ''}`}>
+              {period.name}
+            </h3>
+            <p className="text-sm text-neutral-500 mt-1">
+              {period.startDate} — {period.endDate}
+            </p>
+            {period.notes && (
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1 whitespace-pre-wrap">
+                <Linkify>{period.notes}</Linkify>
+              </p>
+            )}
+          </div>
+          
+          <div className="flex items-center shrink-0">
+            <div className={`flex items-center gap-1 transition-opacity duration-200 mr-2 ${hoveredPeriodId === period.id ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+              <button
+                onClick={(e) => startEditing(e, period)}
+                className="p-1.5 text-neutral-400 hover:text-blue-500 transition-colors rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                title="Edit"
+              >
+                <Edit2 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={(e) => handleDelete(e, period.id)}
+                className="p-1.5 text-neutral-400 hover:text-red-500 transition-colors rounded-md hover:bg-red-50 dark:hover:bg-red-900/20"
+                title="Delete"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+            {isCurrent && <Check className="w-5 h-5 text-blue-500" />}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-6 shadow-sm">
@@ -144,124 +266,42 @@ export default function PeriodManager() {
           <p className="text-sm mt-1">Create your first period to get started.</p>
         </div>
       ) : (
-        <div className="space-y-2">
-          {state.periods.map(period => {
-            const isEditing = editingPeriodId === period.id;
-
-            if (isEditing) {
-              return (
-                <div key={period.id} className="p-4 rounded-lg border border-blue-300 dark:border-blue-700 bg-blue-50/50 dark:bg-blue-900/10 space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Period</label>
-                    <input
-                      type="text"
-                      required
-                      className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-blue-500"
-                      value={editingPeriodData.name || ''}
-                      onChange={e => setEditingPeriodData({ ...editingPeriodData, name: e.target.value })}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Start Date</label>
-                      <input
-                        type="date"
-                        required
-                        className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-blue-500"
-                        value={editingPeriodData.startDate || ''}
-                        onChange={e => setEditingPeriodData({ ...editingPeriodData, startDate: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">End Date</label>
-                      <input
-                        type="date"
-                        required
-                        className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-blue-500"
-                        value={editingPeriodData.endDate || ''}
-                        onChange={e => setEditingPeriodData({ ...editingPeriodData, endDate: e.target.value })}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Notes</label>
-                    <textarea
-                      rows={2}
-                      className="w-full px-3 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-md outline-none focus:ring-2 focus:ring-blue-500"
-                      value={editingPeriodData.notes || ''}
-                      onChange={e => setEditingPeriodData({ ...editingPeriodData, notes: e.target.value })}
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2 pt-2">
-                    <button
-                      onClick={cancelEdit}
-                      className="px-4 py-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={saveEdit}
-                      className="flex items-center gap-1 px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                    >
-                      <Check className="w-4 h-4" />
-                      Save
-                    </button>
-                  </div>
-                </div>
-              );
-            }
-
-            const isCurrent = period.id === state.currentPeriodId;
-            return (
-              <div
-                key={period.id}
-                onClick={() => setCurrentPeriod(period.id)}
-                onMouseEnter={() => setHoveredPeriodId(period.id)}
-                onMouseLeave={() => setHoveredPeriodId(null)}
-                className={`p-4 rounded-lg border cursor-pointer transition-colors ${
-                  isCurrent 
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10 dark:border-blue-500/50' 
-                    : 'border-neutral-200 dark:border-neutral-800 hover:border-blue-300 dark:hover:border-blue-700'
-                }`}
-              >
-                <div className="flex justify-between items-start">
-                  <div className="flex-1 min-w-0 pr-4">
-                    <h3 className={`font-medium ${isCurrent ? 'text-blue-700 dark:text-blue-400' : ''}`}>
-                      {period.name}
-                    </h3>
-                    <p className="text-sm text-neutral-500 mt-1">
-                      {period.startDate} — {period.endDate}
-                    </p>
-                    {period.notes && (
-                      <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1 whitespace-pre-wrap">
-                        <Linkify>{period.notes}</Linkify>
-                      </p>
-                    )}
-                  </div>
-                  
-                  <div className="flex items-center shrink-0">
-                    <div className={`flex items-center gap-1 transition-opacity duration-200 mr-2 ${hoveredPeriodId === period.id ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                      <button
-                        onClick={(e) => startEditing(e, period)}
-                        className="p-1.5 text-neutral-400 hover:text-blue-500 transition-colors rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                        title="Edit"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={(e) => handleDelete(e, period.id)}
-                        className="p-1.5 text-neutral-400 hover:text-red-500 transition-colors rounded-md hover:bg-red-50 dark:hover:bg-red-900/20"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                    {isCurrent && <Check className="w-5 h-5 text-blue-500" />}
-                  </div>
-                </div>
+        <div className="space-y-6">
+          {ongoingPeriods.length > 0 && (
+            <details className="group" open>
+              <summary className="text-sm font-bold text-green-600 dark:text-green-500 mb-3 cursor-pointer list-none flex items-center gap-2 hover:opacity-80 transition-opacity">
+                <span>🎯</span> Ongoing ({ongoingPeriods.length})
+                <ChevronDown className="w-4 h-4 group-open:rotate-180 transition-transform" />
+              </summary>
+              <div className="space-y-2 mt-2">
+                {ongoingPeriods.map(renderPeriod)}
               </div>
-            );
-          })}
+            </details>
+          )}
+
+          {upcomingPeriods.length > 0 && (
+            <details className="group" open>
+              <summary className="text-sm font-bold text-blue-600 dark:text-blue-500 mb-3 cursor-pointer list-none flex items-center gap-2 hover:opacity-80 transition-opacity">
+                <span>📅</span> Upcoming ({upcomingPeriods.length})
+                <ChevronDown className="w-4 h-4 group-open:rotate-180 transition-transform" />
+              </summary>
+              <div className="space-y-2 mt-2">
+                {upcomingPeriods.map(renderPeriod)}
+              </div>
+            </details>
+          )}
+
+          {completedPeriods.length > 0 && (
+            <details className="group">
+              <summary className="text-sm font-bold text-neutral-500 dark:text-neutral-400 mb-3 cursor-pointer list-none flex items-center gap-2 hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors">
+                <span>📦</span> Completed ({completedPeriods.length})
+                <ChevronDown className="w-4 h-4 group-open:rotate-180 transition-transform" />
+              </summary>
+              <div className="space-y-2 mt-2">
+                {completedPeriods.map(renderPeriod)}
+              </div>
+            </details>
+          )}
         </div>
       )}
     </div>

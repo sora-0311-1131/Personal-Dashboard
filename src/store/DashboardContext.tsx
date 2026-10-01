@@ -52,6 +52,7 @@ interface DashboardContextType {
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
+const LAST_SELECTED_PERIOD_KEY = 'personal-dashboard-last-period-id';
 const LOCAL_STORAGE_KEY = 'personal-dashboard-data';
 
 const getDefaultPeriodId = (periods: Period[]): string | null => {
@@ -83,7 +84,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const initializeData = async () => {
       try {
         // Fetch individually to identify which one fails
-        const { data: periodsData, error: pErr } = await supabase.from('periods').select('*');
+        const { data: periodsData, error: pErr } = await supabase.from('periods').select('*').order('start_date', { ascending: false });
         if (pErr) {
           console.error('[Supabase Error] periods table fetch failed', { message: pErr.message, details: pErr.details, hint: pErr.hint, code: pErr.code });
           throw pErr;
@@ -113,7 +114,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           throw tErr;
         }
 
-        const fetchedPeriods = (periodsData || []).map(fromDbPeriod);
+        const fetchedPeriods = (periodsData || []).map(fromDbPeriod).sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
         const fetchedGoals = (goalsData || []).map(fromDbGoal);
         const fetchedNonGoals = (nonGoalsData || []).map(fromDbNonGoal);
         const fetchedProjects = (projectsData || []).map(fromDbProject);
@@ -171,13 +172,19 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             localStorage.removeItem(LOCAL_STORAGE_KEY);
             
             if (mounted) {
+              const sortedLocalPeriods = (localData.periods || []).sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+              let initialPeriodId = localData.currentPeriodId || null;
+              if (initialPeriodId) {
+                localStorage.setItem(LAST_SELECTED_PERIOD_KEY, initialPeriodId);
+              }
+
               setState({
-                periods: localData.periods || [],
+                periods: sortedLocalPeriods,
                 goals: localData.goals || [],
                 nonGoals: localData.nonGoals || [],
                 projects: localData.projects || [],
                 tasks: localData.tasks || [],
-                currentPeriodId: localData.currentPeriodId || null,
+                currentPeriodId: initialPeriodId,
               });
               setIsLoaded(true);
             }
@@ -195,13 +202,24 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
         // --- Normal Load ---
         if (mounted) {
+          let initialPeriodId = null;
+          const savedPeriodId = localStorage.getItem(LAST_SELECTED_PERIOD_KEY);
+          if (savedPeriodId && fetchedPeriods.some(p => p.id === savedPeriodId)) {
+            initialPeriodId = savedPeriodId;
+          } else {
+            initialPeriodId = getDefaultPeriodId(fetchedPeriods);
+            if (initialPeriodId) {
+              localStorage.setItem(LAST_SELECTED_PERIOD_KEY, initialPeriodId);
+            }
+          }
+
           setState({
             periods: fetchedPeriods,
             goals: fetchedGoals,
             nonGoals: fetchedNonGoals,
             projects: fetchedProjects,
             tasks: fetchedTasks,
-            currentPeriodId: getDefaultPeriodId(fetchedPeriods),
+            currentPeriodId: initialPeriodId,
           });
           setIsLoaded(true);
         }
@@ -228,10 +246,17 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
     setState((prev) => {
       const isFirst = prev.periods.length === 0;
+      const newPeriods = [...prev.periods, period].sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+      const newCurrentPeriodId = isFirst ? period.id : prev.currentPeriodId;
+      
+      if (isFirst) {
+        localStorage.setItem(LAST_SELECTED_PERIOD_KEY, period.id);
+      }
+
       return {
         ...prev,
-        periods: [...prev.periods, period],
-        currentPeriodId: isFirst ? period.id : prev.currentPeriodId,
+        periods: newPeriods,
+        currentPeriodId: newCurrentPeriodId,
       };
     });
   };
@@ -249,10 +274,14 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       console.error('Failed to update period', error);
       return;
     }
-    setState((prev) => ({
-      ...prev,
-      periods: prev.periods.map((p) => (p.id === id ? { ...p, ...updates } : p)),
-    }));
+    setState((prev) => {
+      const newPeriods = prev.periods.map((p) => (p.id === id ? { ...p, ...updates } : p));
+      newPeriods.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+      return {
+        ...prev,
+        periods: newPeriods,
+      };
+    });
   };
 
   const deletePeriod = async (id: string) => {
@@ -274,6 +303,11 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         let newCurrentPeriodId = prev.currentPeriodId;
         if (prev.currentPeriodId === id) {
           newCurrentPeriodId = getDefaultPeriodId(remainingPeriods);
+          if (newCurrentPeriodId) {
+            localStorage.setItem(LAST_SELECTED_PERIOD_KEY, newCurrentPeriodId);
+          } else {
+            localStorage.removeItem(LAST_SELECTED_PERIOD_KEY);
+          }
         }
         return {
           ...prev,
@@ -291,6 +325,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const setCurrentPeriod = (id: string) => {
+    localStorage.setItem(LAST_SELECTED_PERIOD_KEY, id);
     setState((prev) => ({ ...prev, currentPeriodId: id }));
   };
 
