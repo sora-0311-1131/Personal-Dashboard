@@ -1,4 +1,5 @@
-import { Period, Goal, NonGoal, Project, Task, EntityStatus, GoalPriority, ProjectPriority, ProjectStatus, TaskPriority, TaskStatus } from '@/types';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Period, Goal, NonGoal, Project, Task, EntityStatus, Priority, ExtendedStatus } from '@/types';
 
 // Utility to convert undefined to null for DB insertion
 const toDbNull = <T>(value: T | undefined): T | null => (value === undefined ? null : value);
@@ -41,7 +42,7 @@ export const fromDbGoal = (row: any): Goal => ({
   title: row.title,
   notes: fromDbNull(row.notes),
   deadline: fromDbNull(row.deadline),
-  priority: fromDbNull(row.priority) as GoalPriority | undefined,
+  priority: fromDbNull(row.priority) as Priority | undefined,
   status: row.status as EntityStatus,
 });
 
@@ -81,8 +82,8 @@ export const fromDbProject = (row: any): Project => ({
   title: row.title,
   notes: fromDbNull(row.notes),
   deadline: fromDbNull(row.deadline),
-  priority: fromDbNull(row.priority) as ProjectPriority | undefined,
-  status: row.status as ProjectStatus,
+  priority: fromDbNull(row.priority) as Priority | undefined,
+  status: row.status as ExtendedStatus,
 });
 
 // --- Task ---
@@ -107,6 +108,6 @@ export const fromDbTask = (row: any): Task => ({
   title: row.title,
   notes: fromDbNull(row.notes),
   deadline: fromDbNull(row.deadline),
-  priority: fromDbNull(row.priority) as TaskPriority | undefined,
-  status: row.status as TaskStatus,
+  priority: fromDbNull(row.priority) as Priority | undefined,
+  status: row.status as ExtendedStatus,
 });

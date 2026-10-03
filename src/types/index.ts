@@ -1,4 +1,6 @@
 export type EntityStatus = 'todo' | 'in-progress' | 'done';
+export type ExtendedStatus = 'todo' | 'in-progress' | 'pending' | 'done';
+export type Priority = 'P0' | 'P1' | 'P2';
 
 export interface Period {
   id: string;
@@ -9,8 +11,6 @@ export interface Period {
   notes?: string;
 }
 
-export type GoalPriority = 'P0' | 'P1' | 'P2';
-
 export interface Goal {
   id: string;
   userId?: string;
@@ -18,7 +18,7 @@ export interface Goal {
   title: string;
   notes?: string;
   deadline?: string;
-  priority?: GoalPriority;
+  priority?: Priority;
   status: EntityStatus;
 }
 
@@ -30,9 +30,6 @@ export interface NonGoal {
   notes?: string;
 }
 
-export type ProjectStatus = 'todo' | 'in-progress' | 'pending' | 'done';
-export type ProjectPriority = 'P0' | 'P1' | 'P2';
-
 export interface Project {
   id: string;
   userId?: string;
@@ -41,12 +38,9 @@ export interface Project {
   title: string;
   notes?: string;
   deadline?: string;
-  priority?: ProjectPriority;
-  status: ProjectStatus;
+  priority?: Priority;
+  status: ExtendedStatus;
 }
-
-export type TaskStatus = 'todo' | 'in-progress' | 'pending' | 'done';
-export type TaskPriority = 'P0' | 'P1' | 'P2';
 
 export interface Task {
   id: string;
@@ -57,6 +51,6 @@ export interface Task {
   title: string;
   notes?: string;
   deadline?: string; // ISO date string
-  priority?: TaskPriority;
-  status: TaskStatus;
+  priority?: Priority;
+  status: ExtendedStatus;
 }
