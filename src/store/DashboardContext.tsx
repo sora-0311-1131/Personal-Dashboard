@@ -131,37 +131,50 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           try {
             const localData = JSON.parse(savedLocalStr) as DashboardState;
             
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error("User not found for migration");
+
             // Insert in order of constraints to respect Foreign Keys
             if (localData.periods && localData.periods.length > 0) {
-              const { error } = await supabase.from('periods').insert(localData.periods.map(toDbPeriod));
+              const { error } = await supabase.from('periods').insert(
+                localData.periods.map(p => ({ ...toDbPeriod(p), user_id: user.id }))
+              );
               if (error) {
                 console.error('[Migration Error] periods insert failed', { message: error.message, code: error.code, details: error.details, hint: error.hint });
                 throw error;
               }
             }
             if (localData.goals && localData.goals.length > 0) {
-              const { error } = await supabase.from('goals').insert(localData.goals.map(toDbGoal));
+              const { error } = await supabase.from('goals').insert(
+                localData.goals.map(g => ({ ...toDbGoal(g), user_id: user.id }))
+              );
               if (error) {
                 console.error('[Migration Error] goals insert failed', { message: error.message, code: error.code, details: error.details, hint: error.hint });
                 throw error;
               }
             }
             if (localData.nonGoals && localData.nonGoals.length > 0) {
-              const { error } = await supabase.from('non_goals').insert(localData.nonGoals.map(toDbNonGoal));
+              const { error } = await supabase.from('non_goals').insert(
+                localData.nonGoals.map(ng => ({ ...toDbNonGoal(ng), user_id: user.id }))
+              );
               if (error) {
                 console.error('[Migration Error] non_goals insert failed', { message: error.message, code: error.code, details: error.details, hint: error.hint });
                 throw error;
               }
             }
             if (localData.projects && localData.projects.length > 0) {
-              const { error } = await supabase.from('projects').insert(localData.projects.map(toDbProject));
+              const { error } = await supabase.from('projects').insert(
+                localData.projects.map(p => ({ ...toDbProject(p), user_id: user.id }))
+              );
               if (error) {
                 console.error('[Migration Error] projects insert failed', { message: error.message, code: error.code, details: error.details, hint: error.hint });
                 throw error;
               }
             }
             if (localData.tasks && localData.tasks.length > 0) {
-              const { error } = await supabase.from('tasks').insert(localData.tasks.map(toDbTask));
+              const { error } = await supabase.from('tasks').insert(
+                localData.tasks.map(t => ({ ...toDbTask(t), user_id: user.id }))
+              );
               if (error) {
                 console.error('[Migration Error] tasks insert failed', { message: error.message, code: error.code, details: error.details, hint: error.hint });
                 throw error;
@@ -229,17 +242,33 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
     };
 
-    initializeData();
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+        if (session?.user) {
+          initializeData();
+        } else if (event === 'INITIAL_SESSION') {
+          if (mounted) setIsLoaded(true);
+        }
+      } else if (event === 'SIGNED_OUT') {
+        if (mounted) {
+          setState(initialState);
+          setIsLoaded(true);
+        }
+      }
+    });
 
     return () => {
       mounted = false;
+      authListener.subscription.unsubscribe();
     };
   }, []);
 
   // --- CRUD Operations ---
   // Period
   const addPeriod = async (period: Period) => {
-    const { error } = await supabase.from('periods').insert(toDbPeriod(period));
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { error } = await supabase.from('periods').insert({ ...toDbPeriod(period), user_id: user.id });
     if (error) {
       console.error('Failed to add period', error);
       return;
@@ -331,7 +360,9 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Goal
   const addGoal = async (goal: Goal) => {
-    const { error } = await supabase.from('goals').insert(toDbGoal(goal));
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { error } = await supabase.from('goals').insert({ ...toDbGoal(goal), user_id: user.id });
     if (error) {
       console.error('Failed to add goal', error);
       return;
@@ -374,7 +405,9 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // NonGoal
   const addNonGoal = async (nonGoal: NonGoal) => {
-    const { error } = await supabase.from('non_goals').insert(toDbNonGoal(nonGoal));
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { error } = await supabase.from('non_goals').insert({ ...toDbNonGoal(nonGoal), user_id: user.id });
     if (error) {
       console.error('Failed to add non-goal', error);
       return;
@@ -412,7 +445,9 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Project
   const addProject = async (project: Project) => {
-    const { error } = await supabase.from('projects').insert(toDbProject(project));
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { error } = await supabase.from('projects').insert({ ...toDbProject(project), user_id: user.id });
     if (error) {
       console.error('Failed to add project', error);
       return;
@@ -461,7 +496,9 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   // Task
   const addTask = async (task: Task) => {
-    const { error } = await supabase.from('tasks').insert(toDbTask(task));
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { error } = await supabase.from('tasks').insert({ ...toDbTask(task), user_id: user.id });
     if (error) {
       console.error('Failed to add task', error);
       return;

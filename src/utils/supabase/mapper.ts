@@ -16,6 +16,7 @@ export const toDbPeriod = (period: Period) => ({
 
 export const fromDbPeriod = (row: any): Period => ({
   id: row.id,
+  userId: row.user_id,
   name: row.name,
   startDate: row.start_date,
   endDate: row.end_date,
@@ -35,6 +36,7 @@ export const toDbGoal = (goal: Goal) => ({
 
 export const fromDbGoal = (row: any): Goal => ({
   id: row.id,
+  userId: row.user_id,
   periodId: row.period_id,
   title: row.title,
   notes: fromDbNull(row.notes),
@@ -53,6 +55,7 @@ export const toDbNonGoal = (nonGoal: NonGoal) => ({
 
 export const fromDbNonGoal = (row: any): NonGoal => ({
   id: row.id,
+  userId: row.user_id,
   periodId: row.period_id,
   title: row.title,
   notes: fromDbNull(row.notes),
@@ -72,6 +75,7 @@ export const toDbProject = (project: Project) => ({
 
 export const fromDbProject = (row: any): Project => ({
   id: row.id,
+  userId: row.user_id,
   periodId: row.period_id,
   goalId: fromDbNull(row.goal_id),
   title: row.title,
@@ -96,6 +100,7 @@ export const toDbTask = (task: Task) => ({
 
 export const fromDbTask = (row: any): Task => ({
   id: row.id,
+  userId: row.user_id,
   periodId: row.period_id,
   projectId: fromDbNull(row.project_id),
   goalId: fromDbNull(row.goal_id),

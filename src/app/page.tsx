@@ -9,7 +9,9 @@ import ProjectManager from "@/components/ProjectManager";
 import TaskManager from "@/components/TaskManager";
 import GoalDetail from "@/components/GoalDetail";
 import ProjectDetail from "@/components/ProjectDetail";
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, LogOut } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 
 type ViewState = 
   | { type: 'home' }
@@ -20,6 +22,13 @@ export default function Home() {
   const { state } = useDashboard();
   const [view, setView] = useState<ViewState>({ type: 'home' });
   const currentPeriod = state.periods.find(p => p.id === state.currentPeriodId);
+  const router = useRouter();
+  const supabase = createClient();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.refresh();
+  };
 
   const navigateToGoal = (id: string) => setView({ type: 'goal', id });
   const navigateToProject = (id: string) => setView({ type: 'project', id });
@@ -35,11 +44,20 @@ export default function Home() {
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 dark:bg-blue-900/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
           
           <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-1.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 rounded-md">
-                <LayoutDashboard className="w-4 h-4" />
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 rounded-md">
+                  <LayoutDashboard className="w-4 h-4" />
+                </div>
+                <span className="text-sm font-medium text-neutral-500 uppercase tracking-wider">Personal Dashboard</span>
               </div>
-              <span className="text-sm font-medium text-neutral-500 uppercase tracking-wider">Personal Dashboard</span>
+              <button 
+                onClick={handleSignOut}
+                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-md transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </button>
             </div>
             {currentPeriod ? (
               <div>

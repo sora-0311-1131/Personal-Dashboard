@@ -2,6 +2,7 @@ export type EntityStatus = 'todo' | 'in-progress' | 'done';
 
 export interface Period {
   id: string;
+  userId?: string;
   name: string;
   startDate: string; // ISO date string
   endDate: string; // ISO date string
@@ -12,6 +13,7 @@ export type GoalPriority = 'P0' | 'P1' | 'P2';
 
 export interface Goal {
   id: string;
+  userId?: string;
   periodId: string;
   title: string;
   notes?: string;
@@ -22,6 +24,7 @@ export interface Goal {
 
 export interface NonGoal {
   id: string;
+  userId?: string;
   periodId: string;
   title: string;
   notes?: string;
@@ -32,6 +35,7 @@ export type ProjectPriority = 'P0' | 'P1' | 'P2';
 
 export interface Project {
   id: string;
+  userId?: string;
   periodId: string;
   goalId?: string;
   title: string;
@@ -46,6 +50,7 @@ export type TaskPriority = 'P0' | 'P1' | 'P2';
 
 export interface Task {
   id: string;
+  userId?: string;
   periodId: string;
   projectId?: string;
   goalId?: string;
