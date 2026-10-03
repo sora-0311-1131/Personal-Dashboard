@@ -72,10 +72,19 @@ const getDefaultPeriodId = (periods: Period[]): string | null => {
   return periods[0].id;
 };
 
-export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const DashboardProvider: React.FC<{ children: React.ReactNode; userId?: string | null }> = ({ children, userId }) => {
   const [state, setState] = useState<DashboardState>(initialState);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [prevUserId, setPrevUserId] = useState<string | null | undefined>(userId);
   const supabase = createClient();
+
+  // If userId changed from the server (e.g., after login/logout), clear the state immediately during render
+  // to prevent old user data from flashing on screen.
+  if (userId !== undefined && userId !== prevUserId) {
+    setPrevUserId(userId);
+    setState(initialState);
+    setIsLoaded(false);
+  }
 
   // Load from Supabase on mount
   useEffect(() => {
@@ -157,22 +166,34 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
     };
 
-    console.log('[Performance] Auth Listener Registered');
+    console.log('[Performance] Auth Listener Registered or UserId Changed', { propUserId: userId });
     
-    // Explicitly check user on mount using getUser() (makes a network request, bypassing client clock issues)
-    supabase.auth.getUser().then(({ data: { user }, error }) => {
-      console.log('[Performance] Initial getUser result:', { userId: user?.id, error });
-      if (user) {
+    if (userId !== undefined) {
+      if (userId) {
+        // We already know the user from the server prop! Fetch immediately.
         initializeData();
-      } else if (mounted) {
+      } else {
+        // Explicitly logged out based on server prop
         setIsLoaded(true);
       }
-    });
+    } else {
+      // Fallback if userId prop wasn't passed (shouldn't happen with updated layout)
+      supabase.auth.getUser().then(({ data: { user }, error }) => {
+        if (user) {
+          initializeData();
+        } else if (mounted) {
+          setIsLoaded(true);
+        }
+      });
+    }
 
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       console.log(`[Performance] onAuthStateChange event: ${event}`, { userId: session?.user?.id });
       if (event === 'SIGNED_IN') {
-        if (session?.user) {
+        // If the client catches a sign in event for a user different from the current one,
+        // we might need to fetch data. Though the server-passed userId handles the redirect case,
+        // this handles cases where the user logs in in another tab or changes purely client-side.
+        if (session?.user && session.user.id !== userId) {
           initializeData();
         }
       }
@@ -186,7 +207,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       mounted = false;
       authListener.subscription.unsubscribe();
     };
-  }, []);
+  }, [userId]); // Add userId to dependency array so it re-runs when userId changes
 
   // --- CRUD Operations ---
   // Period
