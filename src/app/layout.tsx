@@ -4,6 +4,7 @@ import "./globals.css";
 import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import { DashboardProvider } from "@/store/DashboardContext";
+import Sidebar from "@/components/layout/Sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,14 +29,18 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
   const { data: { user } } = await supabase.auth.getUser();
+  
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="h-screen flex overflow-hidden bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100">
         <DashboardProvider userId={user?.id || null}>
-          {children}
+          {user && <Sidebar />}
+          <div className="flex-1 h-screen overflow-y-auto">
+            {children}
+          </div>
         </DashboardProvider>
       </body>
     </html>

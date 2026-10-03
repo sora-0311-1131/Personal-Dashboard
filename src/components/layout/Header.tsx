@@ -2,20 +2,11 @@
 
 import React from 'react';
 import { useDashboard } from "@/store/DashboardContext";
-import { LayoutDashboard, LogOut } from "lucide-react";
-import { createClient } from "@/utils/supabase/client";
-import { useRouter } from "next/navigation";
+import { LayoutDashboard } from "lucide-react";
 
 export default function Header() {
   const { state } = useDashboard();
   const currentPeriod = state.periods.find(p => p.id === state.currentPeriodId);
-  const router = useRouter();
-  const supabase = createClient();
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.refresh();
-  };
 
   return (
     <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 bg-white dark:bg-neutral-900 p-8 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-sm relative overflow-hidden">
@@ -30,13 +21,6 @@ export default function Header() {
             </div>
             <span className="text-sm font-medium text-neutral-500 uppercase tracking-wider">Personal Dashboard</span>
           </div>
-          <button 
-            onClick={handleSignOut}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 rounded-md transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
-            Sign Out
-          </button>
         </div>
         {currentPeriod ? (
           <div>
