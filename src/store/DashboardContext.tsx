@@ -83,32 +83,39 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     
     const initializeData = async () => {
       try {
-        // Fetch individually to identify which one fails
-        const { data: periodsData, error: pErr } = await supabase.from('periods').select('*').order('start_date', { ascending: false });
+        // Fetch all tables concurrently to reduce lag
+        console.time('[Performance] Supabase Data Fetch');
+        const [
+          { data: periodsData, error: pErr },
+          { data: goalsData, error: gErr },
+          { data: nonGoalsData, error: ngErr },
+          { data: projectsData, error: prjErr },
+          { data: tasksData, error: tErr }
+        ] = await Promise.all([
+          supabase.from('periods').select('*').order('start_date', { ascending: false }),
+          supabase.from('goals').select('*'),
+          supabase.from('non_goals').select('*'),
+          supabase.from('projects').select('*'),
+          supabase.from('tasks').select('*')
+        ]);
+        console.timeEnd('[Performance] Supabase Data Fetch');
+
         if (pErr) {
           console.error('[Supabase Error] periods table fetch failed', { message: pErr.message, details: pErr.details, hint: pErr.hint, code: pErr.code });
           throw pErr;
         }
-
-        const { data: goalsData, error: gErr } = await supabase.from('goals').select('*');
         if (gErr) {
           console.error('[Supabase Error] goals table fetch failed', { message: gErr.message, details: gErr.details, hint: gErr.hint, code: gErr.code });
           throw gErr;
         }
-
-        const { data: nonGoalsData, error: ngErr } = await supabase.from('non_goals').select('*');
         if (ngErr) {
           console.error('[Supabase Error] non_goals table fetch failed', { message: ngErr.message, details: ngErr.details, hint: ngErr.hint, code: ngErr.code });
           throw ngErr;
         }
-
-        const { data: projectsData, error: prjErr } = await supabase.from('projects').select('*');
         if (prjErr) {
           console.error('[Supabase Error] projects table fetch failed', { message: prjErr.message, details: prjErr.details, hint: prjErr.hint, code: prjErr.code });
           throw prjErr;
         }
-
-        const { data: tasksData, error: tErr } = await supabase.from('tasks').select('*');
         if (tErr) {
           console.error('[Supabase Error] tasks table fetch failed', { message: tErr.message, details: tErr.details, hint: tErr.hint, code: tErr.code });
           throw tErr;
@@ -120,100 +127,8 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const fetchedProjects = (projectsData || []).map(fromDbProject);
         const fetchedTasks = (tasksData || []).map(fromDbTask);
 
-        // --- Local Storage Migration Logic ---
-        const isEmptyDb = fetchedPeriods.length === 0 && fetchedGoals.length === 0 &&
-                          fetchedNonGoals.length === 0 && fetchedProjects.length === 0 &&
-                          fetchedTasks.length === 0;
-
-        const savedLocalStr = localStorage.getItem(LOCAL_STORAGE_KEY);
-        if (isEmptyDb && savedLocalStr) {
-          console.log('Starting local storage migration to Supabase...');
-          try {
-            const localData = JSON.parse(savedLocalStr) as DashboardState;
-            
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) throw new Error("User not found for migration");
-
-            // Insert in order of constraints to respect Foreign Keys
-            if (localData.periods && localData.periods.length > 0) {
-              const { error } = await supabase.from('periods').insert(
-                localData.periods.map(p => ({ ...toDbPeriod(p), user_id: user.id }))
-              );
-              if (error) {
-                console.error('[Migration Error] periods insert failed', { message: error.message, code: error.code, details: error.details, hint: error.hint });
-                throw error;
-              }
-            }
-            if (localData.goals && localData.goals.length > 0) {
-              const { error } = await supabase.from('goals').insert(
-                localData.goals.map(g => ({ ...toDbGoal(g), user_id: user.id }))
-              );
-              if (error) {
-                console.error('[Migration Error] goals insert failed', { message: error.message, code: error.code, details: error.details, hint: error.hint });
-                throw error;
-              }
-            }
-            if (localData.nonGoals && localData.nonGoals.length > 0) {
-              const { error } = await supabase.from('non_goals').insert(
-                localData.nonGoals.map(ng => ({ ...toDbNonGoal(ng), user_id: user.id }))
-              );
-              if (error) {
-                console.error('[Migration Error] non_goals insert failed', { message: error.message, code: error.code, details: error.details, hint: error.hint });
-                throw error;
-              }
-            }
-            if (localData.projects && localData.projects.length > 0) {
-              const { error } = await supabase.from('projects').insert(
-                localData.projects.map(p => ({ ...toDbProject(p), user_id: user.id }))
-              );
-              if (error) {
-                console.error('[Migration Error] projects insert failed', { message: error.message, code: error.code, details: error.details, hint: error.hint });
-                throw error;
-              }
-            }
-            if (localData.tasks && localData.tasks.length > 0) {
-              const { error } = await supabase.from('tasks').insert(
-                localData.tasks.map(t => ({ ...toDbTask(t), user_id: user.id }))
-              );
-              if (error) {
-                console.error('[Migration Error] tasks insert failed', { message: error.message, code: error.code, details: error.details, hint: error.hint });
-                throw error;
-              }
-            }
-            
-            console.log('Migration successful. Clearing local storage.');
-            localStorage.removeItem(LOCAL_STORAGE_KEY);
-            
-            if (mounted) {
-              const sortedLocalPeriods = (localData.periods || []).sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
-              let initialPeriodId = localData.currentPeriodId || null;
-              if (initialPeriodId) {
-                localStorage.setItem(LAST_SELECTED_PERIOD_KEY, initialPeriodId);
-              }
-
-              setState({
-                periods: sortedLocalPeriods,
-                goals: localData.goals || [],
-                nonGoals: localData.nonGoals || [],
-                projects: localData.projects || [],
-                tasks: localData.tasks || [],
-                currentPeriodId: initialPeriodId,
-              });
-              setIsLoaded(true);
-            }
-            return;
-          } catch (migrationErr: any) {
-            console.error('Migration failed, local storage intact:', {
-              message: migrationErr?.message,
-              code: migrationErr?.code,
-              details: migrationErr?.details,
-              hint: migrationErr?.hint
-            });
-            // Fallthrough to normal load logic (empty DB) on failure
-          }
-        }
-
-        // --- Normal Load ---
+        // Note: Automatic local storage migration has been removed to prevent 
+        // old browser data from syncing into newly created accounts.
         if (mounted) {
           let initialPeriodId = null;
           const savedPeriodId = localStorage.getItem(LAST_SELECTED_PERIOD_KEY);
@@ -242,19 +157,29 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
     };
 
+    console.log('[Performance] Auth Listener Registered');
+    
+    // Explicitly check session on mount (more reliable for mobile/Safari)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('[Performance] Initial getSession result:', { userId: session?.user?.id });
+      if (session?.user) {
+        initializeData();
+      } else if (mounted) {
+        setIsLoaded(true);
+      }
+    });
+
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+      console.log(`[Performance] onAuthStateChange event: ${event}`, { userId: session?.user?.id });
+      if (event === 'SIGNED_IN') {
         if (session?.user) {
           initializeData();
-        } else if (event === 'INITIAL_SESSION') {
-          if (mounted) setIsLoaded(true);
-        }
-      } else if (event === 'SIGNED_OUT') {
-        if (mounted) {
-          setState(initialState);
-          setIsLoaded(true);
         }
       }
+      // We intentionally ignore SIGNED_OUT events here. 
+      // @supabase/ssr often emits spurious SIGNED_OUT events due to token refresh race conditions 
+      // between the client and server. 
+      // Actual logouts will be handled by the Next.js server (proxy.ts) redirecting to /login.
     });
 
     return () => {
