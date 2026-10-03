@@ -159,10 +159,10 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     console.log('[Performance] Auth Listener Registered');
     
-    // Explicitly check session on mount (more reliable for mobile/Safari)
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('[Performance] Initial getSession result:', { userId: session?.user?.id });
-      if (session?.user) {
+    // Explicitly check user on mount using getUser() (makes a network request, bypassing client clock issues)
+    supabase.auth.getUser().then(({ data: { user }, error }) => {
+      console.log('[Performance] Initial getUser result:', { userId: user?.id, error });
+      if (user) {
         initializeData();
       } else if (mounted) {
         setIsLoaded(true);
