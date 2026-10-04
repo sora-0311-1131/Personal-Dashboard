@@ -35,10 +35,10 @@ export default async function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="h-screen flex overflow-hidden bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100">
+      <body className="h-[100dvh] flex flex-col xl:flex-row overflow-hidden bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100">
         <DashboardProvider userId={user?.id || null}>
           {user && <Sidebar />}
-          <div className="flex-1 h-screen overflow-y-auto">
+          <div className="flex-1 overflow-y-auto">
             {children}
           </div>
         </DashboardProvider>
