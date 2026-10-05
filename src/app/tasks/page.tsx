@@ -4,7 +4,7 @@ import React from 'react';
 import TaskManager from "@/components/TaskManager";
 import ProjectManager from "@/components/ProjectManager";
 import { useDashboard } from "@/store/DashboardContext";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 
 export default function TasksPage() {
   const { state } = useDashboard();

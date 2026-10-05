@@ -3,7 +3,8 @@
 import React from 'react';
 import GoalDetail from "@/components/GoalDetail";
 import Header from "@/components/layout/Header";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 
 export default function GoalPage() {
   const params = useParams();

@@ -3,7 +3,8 @@
 import React from 'react';
 import ProjectDetail from "@/components/ProjectDetail";
 import Header from "@/components/layout/Header";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 import { useDashboard } from "@/store/DashboardContext";
 
 export default function ProjectPage() {

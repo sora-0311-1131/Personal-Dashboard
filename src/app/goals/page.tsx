@@ -4,7 +4,7 @@ import React from 'react';
 import GoalManager from "@/components/GoalManager";
 import NonGoalManager from "@/components/NonGoalManager";
 import { useDashboard } from "@/store/DashboardContext";
-import { useRouter } from "next/navigation";
+import { useRouter } from "nextjs-toploader/app";
 
 export default function GoalsPage() {
   const { state } = useDashboard();
