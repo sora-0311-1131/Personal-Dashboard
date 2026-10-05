@@ -4,9 +4,11 @@ import React from 'react';
 import GoalManager from "@/components/GoalManager";
 import NonGoalManager from "@/components/NonGoalManager";
 import { useDashboard } from "@/store/DashboardContext";
+import { useRouter } from "next/navigation";
 
 export default function GoalsPage() {
   const { state } = useDashboard();
+  const router = useRouter();
 
   return (
     <main className="p-4 sm:p-8 lg:p-12">
@@ -19,7 +21,7 @@ export default function GoalsPage() {
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
           <div className="xl:col-span-8 space-y-8">
             {state.currentPeriodId ? (
-              <GoalManager />
+              <GoalManager onGoalClick={(id) => router.push(`/goals/${id}`)} />
             ) : (
               <div className="p-8 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 text-center">
                 <h3 className="text-lg font-medium text-neutral-900 dark:text-white">No Period Selected</h3>

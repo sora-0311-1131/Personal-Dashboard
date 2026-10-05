@@ -4,9 +4,11 @@ import React from 'react';
 import TaskManager from "@/components/TaskManager";
 import ProjectManager from "@/components/ProjectManager";
 import { useDashboard } from "@/store/DashboardContext";
+import { useRouter } from "next/navigation";
 
 export default function TasksPage() {
   const { state } = useDashboard();
+  const router = useRouter();
 
   return (
     <main className="p-4 sm:p-8 lg:p-12">
@@ -27,7 +29,7 @@ export default function TasksPage() {
               <TaskManager />
             </div>
             <div className="space-y-8">
-              <ProjectManager />
+              <ProjectManager onProjectClick={(id) => router.push(`/projects/${id}`)} />
             </div>
           </div>
         )}
