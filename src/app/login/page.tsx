@@ -2,7 +2,8 @@
 
 import React, { useState, useTransition } from 'react';
 import { login, signup } from './actions';
-import { Mail, Lock, ArrowRight, Loader2, Sparkles, Hexagon } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Loader2, Sparkles, Target } from 'lucide-react';
+import { siteConfig } from '@/config/site';
 
 export default function LoginPage() {
   const [isPending, startTransition] = useTransition();
@@ -33,9 +34,12 @@ export default function LoginPage() {
         <div className="flex flex-col items-center mb-8">
           <div className="w-16 h-16 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl flex items-center justify-center shadow-xl shadow-black/5 mb-6 relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <Hexagon className="w-8 h-8 text-neutral-800 dark:text-neutral-200" />
+            <Target className="w-8 h-8 text-blue-500" />
             <Sparkles className="w-4 h-4 text-blue-500 absolute top-3 right-3 animate-pulse" />
           </div>
+          <span className="text-base font-bold tracking-tight text-blue-500 mb-2">
+            {siteConfig.name}
+          </span>
           <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-white mb-2 text-center">
             {mode === 'login' ? 'Welcome back' : 'Create an account'}
           </h1>

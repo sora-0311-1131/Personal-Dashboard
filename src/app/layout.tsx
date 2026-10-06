@@ -6,6 +6,7 @@ import { createClient } from "@/utils/supabase/server";
 import { DashboardProvider } from "@/store/DashboardContext";
 import Sidebar from "@/components/layout/Sidebar";
 import NextTopLoader from 'nextjs-toploader';
+import { siteConfig } from "@/config/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,8 +19,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Personal Dashboard",
-  description: "A dashboard to manage your periods, goals, and tasks.",
+  title: {
+    default: siteConfig.name,
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  applicationName: siteConfig.name,
 };
 
 export default async function RootLayout({

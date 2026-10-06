@@ -22,6 +22,7 @@ import {
   Lock
 } from 'lucide-react';
 import { createClient } from "@/utils/supabase/client";
+import { siteConfig } from "@/config/site";
 
 type NavItem = {
   name: string;
@@ -97,7 +98,7 @@ export default function Sidebar() {
         </button>
         <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white flex items-center gap-2">
           <Target className="w-6 h-6 text-blue-500" />
-          LifeOS
+          {siteConfig.name}
         </h2>
       </div>
 
@@ -119,7 +120,7 @@ export default function Sidebar() {
         <div className="p-6 pb-2 flex justify-between items-center">
           <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white flex items-center gap-2">
             <Target className="w-6 h-6 text-blue-500" />
-            <span className="block">LifeOS</span>
+            <span className="block">{siteConfig.name}</span>
           </h2>
           <button 
             onClick={() => setIsOpen(false)}

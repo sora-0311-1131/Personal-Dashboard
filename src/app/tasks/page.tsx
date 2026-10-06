@@ -21,7 +21,7 @@ export default function TasksPage() {
         {!state.currentPeriodId ? (
           <div className="p-8 bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800 text-center">
             <h3 className="text-lg font-medium text-neutral-900 dark:text-white">No Period Selected</h3>
-            <p className="text-neutral-500 mt-2">Please select or create a period from the Goals page to manage tasks.</p>
+            <p className="text-neutral-500 mt-2">Please select or create a period from the Periods page to manage tasks.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
