@@ -21,7 +21,10 @@ export default function TaskItem({ task }: { task: Task }) {
 
   const saveEdit = () => {
     if (editingData.title) {
-      updateTask(task.id, editingData);
+      // Status is managed by the dropdown, so exclude it to avoid overwriting with stale values
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { status, ...updates } = editingData;
+      updateTask(task.id, updates);
       setIsEditing(false);
     }
   };
@@ -182,7 +185,7 @@ export default function TaskItem({ task }: { task: Task }) {
 
         <div className={`flex items-center gap-1 transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
           <button
-            onClick={() => setIsEditing(true)}
+            onClick={() => { setEditingData(task); setIsEditing(true); }}
             className="p-1.5 text-neutral-400 hover:text-blue-500 transition-colors rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20"
             title="Edit"
           >

@@ -28,7 +28,10 @@ export default function GoalItem({
 
   const saveEdit = () => {
     if (editingData.title) {
-      updateGoal(goal.id, editingData);
+      // Status is managed by the dropdown, so exclude it to avoid overwriting with stale values
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { status, ...updates } = editingData;
+      updateGoal(goal.id, updates);
       setIsEditing(false);
     }
   };
@@ -170,7 +173,7 @@ export default function GoalItem({
 
         <div className={`flex items-center gap-1 transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
           <button
-            onClick={(e) => { e.stopPropagation(); setIsEditing(true); }}
+            onClick={(e) => { e.stopPropagation(); setEditingData(goal); setIsEditing(true); }}
             className="p-1.5 text-neutral-400 hover:text-indigo-500 transition-colors rounded-md hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
             title="Edit"
           >

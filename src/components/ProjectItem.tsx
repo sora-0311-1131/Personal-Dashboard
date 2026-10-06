@@ -32,7 +32,10 @@ export default function ProjectItem({
 
   const saveEdit = () => {
     if (editingData.title) {
-      updateProject(project.id, editingData);
+      // Status is managed by the dropdown, so exclude it to avoid overwriting with stale values
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { status, ...updates } = editingData;
+      updateProject(project.id, updates);
       setIsEditing(false);
     }
   };
@@ -193,7 +196,7 @@ export default function ProjectItem({
 
         <div className={`flex items-center gap-1 transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
           <button
-            onClick={(e) => { e.stopPropagation(); setIsEditing(true); }}
+            onClick={(e) => { e.stopPropagation(); setEditingData(project); setIsEditing(true); }}
             className="p-1.5 text-neutral-400 hover:text-blue-500 transition-colors rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20"
             title="Edit"
           >

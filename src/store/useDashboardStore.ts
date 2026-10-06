@@ -64,6 +64,23 @@ const getDefaultPeriodId = (periods: Period[]): string | null => {
   return periods[0].id;
 };
 
+// Checks whether a key is explicitly present in an updates object (even if its value is undefined).
+// This lets callers clear optional fields by passing `undefined`.
+const has = (obj: object, key: PropertyKey): boolean =>
+  Object.prototype.hasOwnProperty.call(obj, key);
+
+// Normalizes cleared optional fields ('' or undefined) to undefined in the given updates object.
+const normalizeOptional = <T extends object>(updates: Partial<T>, keys: (keyof T)[]): Partial<T> => {
+  const result: Partial<T> = { ...updates };
+  for (const key of keys) {
+    const value: unknown = result[key];
+    if (has(result, key) && (value === '' || value === undefined)) {
+      result[key] = undefined;
+    }
+  }
+  return result;
+};
+
 export const useDashboardStore = create<DashboardStore>((set, get) => {
   const supabase = createClient();
 
@@ -139,12 +156,13 @@ export const useDashboardStore = create<DashboardStore>((set, get) => {
       });
     },
 
-    updatePeriod: async (id: string, updates: Partial<Period>) => {
+    updatePeriod: async (id: string, rawUpdates: Partial<Period>) => {
+      const updates = normalizeOptional(rawUpdates, ['notes']);
       const dbUpdates: Record<string, unknown> = {};
       if (updates.name !== undefined) dbUpdates.name = updates.name;
       if (updates.startDate !== undefined) dbUpdates.start_date = updates.startDate;
       if (updates.endDate !== undefined) dbUpdates.end_date = updates.endDate;
-      if (updates.notes !== undefined) dbUpdates.notes = updates.notes === undefined ? null : updates.notes;
+      if (has(updates, 'notes')) dbUpdates.notes = updates.notes ?? null;
 
       const { error } = await supabase.from('periods').update(dbUpdates).eq('id', id);
       if (error) return console.error('Failed to update period', error);
@@ -202,12 +220,13 @@ export const useDashboardStore = create<DashboardStore>((set, get) => {
       set(prev => ({ state: { ...prev.state, goals: [...prev.state.goals, goal] } }));
     },
 
-    updateGoal: async (id: string, updates: Partial<Goal>) => {
+    updateGoal: async (id: string, rawUpdates: Partial<Goal>) => {
+      const updates = normalizeOptional(rawUpdates, ['notes', 'deadline', 'priority']);
       const dbUpdates: Record<string, unknown> = {};
       if (updates.title !== undefined) dbUpdates.title = updates.title;
-      if (updates.notes !== undefined) dbUpdates.notes = updates.notes ?? null;
-      if (updates.deadline !== undefined) dbUpdates.deadline = updates.deadline ?? null;
-      if (updates.priority !== undefined) dbUpdates.priority = updates.priority ?? null;
+      if (has(updates, 'notes')) dbUpdates.notes = updates.notes ?? null;
+      if (has(updates, 'deadline')) dbUpdates.deadline = updates.deadline ?? null;
+      if (has(updates, 'priority')) dbUpdates.priority = updates.priority ?? null;
       if (updates.status !== undefined) dbUpdates.status = updates.status;
 
       const { error } = await supabase.from('goals').update(dbUpdates).eq('id', id);
@@ -232,10 +251,11 @@ export const useDashboardStore = create<DashboardStore>((set, get) => {
       set(prev => ({ state: { ...prev.state, nonGoals: [...prev.state.nonGoals, nonGoal] } }));
     },
 
-    updateNonGoal: async (id: string, updates: Partial<NonGoal>) => {
+    updateNonGoal: async (id: string, rawUpdates: Partial<NonGoal>) => {
+      const updates = normalizeOptional(rawUpdates, ['notes']);
       const dbUpdates: Record<string, unknown> = {};
       if (updates.title !== undefined) dbUpdates.title = updates.title;
-      if (updates.notes !== undefined) dbUpdates.notes = updates.notes ?? null;
+      if (has(updates, 'notes')) dbUpdates.notes = updates.notes ?? null;
 
       const { error } = await supabase.from('non_goals').update(dbUpdates).eq('id', id);
       if (error) return console.error('Failed to update non-goal', error);
@@ -259,13 +279,14 @@ export const useDashboardStore = create<DashboardStore>((set, get) => {
       set(prev => ({ state: { ...prev.state, projects: [...prev.state.projects, project] } }));
     },
 
-    updateProject: async (id: string, updates: Partial<Project>) => {
+    updateProject: async (id: string, rawUpdates: Partial<Project>) => {
+      const updates = normalizeOptional(rawUpdates, ['goalId', 'notes', 'deadline', 'priority']);
       const dbUpdates: Record<string, unknown> = {};
       if (updates.title !== undefined) dbUpdates.title = updates.title;
-      if (updates.goalId !== undefined) dbUpdates.goal_id = updates.goalId ?? null;
-      if (updates.notes !== undefined) dbUpdates.notes = updates.notes ?? null;
-      if (updates.deadline !== undefined) dbUpdates.deadline = updates.deadline ?? null;
-      if (updates.priority !== undefined) dbUpdates.priority = updates.priority ?? null;
+      if (has(updates, 'goalId')) dbUpdates.goal_id = updates.goalId ?? null;
+      if (has(updates, 'notes')) dbUpdates.notes = updates.notes ?? null;
+      if (has(updates, 'deadline')) dbUpdates.deadline = updates.deadline ?? null;
+      if (has(updates, 'priority')) dbUpdates.priority = updates.priority ?? null;
       if (updates.status !== undefined) dbUpdates.status = updates.status;
 
       const { error } = await supabase.from('projects').update(dbUpdates).eq('id', id);
@@ -302,14 +323,15 @@ export const useDashboardStore = create<DashboardStore>((set, get) => {
       set(prev => ({ state: { ...prev.state, tasks: [...prev.state.tasks, task] } }));
     },
 
-    updateTask: async (id: string, updates: Partial<Task>) => {
+    updateTask: async (id: string, rawUpdates: Partial<Task>) => {
+      const updates = normalizeOptional(rawUpdates, ['projectId', 'goalId', 'notes', 'deadline', 'priority']);
       const dbUpdates: Record<string, unknown> = {};
       if (updates.title !== undefined) dbUpdates.title = updates.title;
-      if (updates.projectId !== undefined) dbUpdates.project_id = updates.projectId ?? null;
-      if (updates.goalId !== undefined) dbUpdates.goal_id = updates.goalId ?? null;
-      if (updates.notes !== undefined) dbUpdates.notes = updates.notes ?? null;
-      if (updates.deadline !== undefined) dbUpdates.deadline = updates.deadline ?? null;
-      if (updates.priority !== undefined) dbUpdates.priority = updates.priority ?? null;
+      if (has(updates, 'projectId')) dbUpdates.project_id = updates.projectId ?? null;
+      if (has(updates, 'goalId')) dbUpdates.goal_id = updates.goalId ?? null;
+      if (has(updates, 'notes')) dbUpdates.notes = updates.notes ?? null;
+      if (has(updates, 'deadline')) dbUpdates.deadline = updates.deadline ?? null;
+      if (has(updates, 'priority')) dbUpdates.priority = updates.priority ?? null;
       if (updates.status !== undefined) dbUpdates.status = updates.status;
 
       const { error } = await supabase.from('tasks').update(dbUpdates).eq('id', id);
