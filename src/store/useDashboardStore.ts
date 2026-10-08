@@ -1,12 +1,13 @@
 import { create } from 'zustand';
-import { Period, Goal, NonGoal, Project, Task } from '@/types';
+import { Period, Goal, NonGoal, Project, Task, Event } from '@/types';
 import { createClient } from '@/utils/supabase/client';
 import {
   fromDbPeriod, toDbPeriod,
   fromDbGoal, toDbGoal,
   fromDbNonGoal, toDbNonGoal,
   fromDbProject, toDbProject,
-  fromDbTask, toDbTask
+  fromDbTask, toDbTask,
+  fromDbEvent, toDbEvent
 } from '@/utils/supabase/mapper';
 
 export interface DashboardState {
@@ -16,6 +17,7 @@ export interface DashboardState {
   nonGoals: NonGoal[];
   projects: Project[];
   tasks: Task[];
+  events: Event[];
 }
 
 interface DashboardStore {
@@ -39,6 +41,9 @@ interface DashboardStore {
   addTask: (task: Task) => void;
   updateTask: (id: string, updates: Partial<Task>) => void;
   deleteTask: (id: string) => void;
+  addEvent: (event: Event) => void;
+  updateEvent: (id: string, updates: Partial<Event>) => void;
+  deleteEvent: (id: string) => void;
 }
 
 const initialState: DashboardState = {
@@ -48,6 +53,7 @@ const initialState: DashboardState = {
   nonGoals: [],
   projects: [],
   tasks: [],
+  events: [],
 };
 
 const LAST_SELECTED_PERIOD_KEY = 'personal-dashboard-last-period-id';
@@ -97,13 +103,15 @@ export const useDashboardStore = create<DashboardStore>((set, get) => {
           { data: goalsData },
           { data: nonGoalsData },
           { data: projectsData },
-          { data: tasksData }
+          { data: tasksData },
+          { data: eventsData }
         ] = await Promise.all([
           supabase.from('periods').select('*').order('start_date', { ascending: false }),
           supabase.from('goals').select('*'),
           supabase.from('non_goals').select('*'),
           supabase.from('projects').select('*'),
-          supabase.from('tasks').select('*')
+          supabase.from('tasks').select('*'),
+          supabase.from('events').select('*').order('date', { ascending: true })
         ]);
 
         const fetchedPeriods = (periodsData || []).map(fromDbPeriod).sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
@@ -111,6 +119,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => {
         const fetchedNonGoals = (nonGoalsData || []).map(fromDbNonGoal);
         const fetchedProjects = (projectsData || []).map(fromDbProject);
         const fetchedTasks = (tasksData || []).map(fromDbTask);
+        const fetchedEvents = (eventsData || []).map(fromDbEvent);
 
         let initialPeriodId = null;
         const savedPeriodId = localStorage.getItem(LAST_SELECTED_PERIOD_KEY);
@@ -130,6 +139,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => {
             nonGoals: fetchedNonGoals,
             projects: fetchedProjects,
             tasks: fetchedTasks,
+            events: fetchedEvents,
             currentPeriodId: initialPeriodId,
           },
           isLoaded: true
@@ -346,6 +356,39 @@ export const useDashboardStore = create<DashboardStore>((set, get) => {
       const { error } = await supabase.from('tasks').delete().eq('id', id);
       if (error) return console.error('Failed to delete task', error);
       set(prev => ({ state: { ...prev.state, tasks: prev.state.tasks.filter(t => t.id !== id) } }));
+    },
+
+    addEvent: async (event: Event) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { error } = await supabase.from('events').insert({ ...toDbEvent(event), user_id: user.id });
+      if (error) {
+        alert(`Failed to add event: ${error.message} \nDetails: ${error.details} \nHint: ${error.hint}`);
+        return console.error('Failed to add event', error);
+      }
+      set(prev => ({ state: { ...prev.state, events: [...prev.state.events, event] } }));
+    },
+
+
+    updateEvent: async (id: string, rawUpdates: Partial<Event>) => {
+      const updates = normalizeOptional(rawUpdates, ['notes']);
+      const dbUpdates: Record<string, unknown> = {};
+      if (updates.title !== undefined) dbUpdates.title = updates.title;
+      if (updates.date !== undefined) dbUpdates.date = updates.date;
+      if (has(updates, 'notes')) dbUpdates.notes = updates.notes ?? null;
+
+      const { error } = await supabase.from('events').update(dbUpdates).eq('id', id);
+      if (error) return console.error('Failed to update event', error);
+      
+      set(prev => ({
+        state: { ...prev.state, events: prev.state.events.map(e => (e.id === id ? { ...e, ...updates } : e)) }
+      }));
+    },
+
+    deleteEvent: async (id: string) => {
+      const { error } = await supabase.from('events').delete().eq('id', id);
+      if (error) return console.error('Failed to delete event', error);
+      set(prev => ({ state: { ...prev.state, events: prev.state.events.filter(e => e.id !== id) } }));
     }
   };
 });

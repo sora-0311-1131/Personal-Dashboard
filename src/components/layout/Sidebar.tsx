@@ -37,6 +37,7 @@ const NAVIGATION_ITEMS: NavItem[] = [
   { name: 'Tasks', href: '/tasks', icon: CheckSquare },
   { name: 'Goals', href: '/goals', icon: Target },
   { name: 'Periods', href: '/periods', icon: Clock },
+  { name: 'Events', href: '/events', icon: Calendar },
   { name: 'Calendar', href: '/calendar', icon: Calendar, comingSoon: true },
   { name: 'Study', href: '/study', icon: BookOpen, comingSoon: true },
   { name: 'Habits', href: '/habits', icon: RefreshCw, comingSoon: true },

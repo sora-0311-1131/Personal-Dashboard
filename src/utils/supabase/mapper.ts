@@ -111,3 +111,19 @@ export const fromDbTask = (row: any): Task => ({
   priority: fromDbNull(row.priority) as Priority | undefined,
   status: row.status as ExtendedStatus,
 });
+
+// --- Event ---
+export const toDbEvent = (event: import('@/types').Event) => ({
+  id: event.id,
+  title: event.title,
+  date: event.date,
+  notes: toDbNull(event.notes),
+});
+
+export const fromDbEvent = (row: any): import('@/types').Event => ({
+  id: row.id,
+  userId: row.user_id,
+  title: row.title,
+  date: row.date,
+  notes: fromDbNull(row.notes),
+});

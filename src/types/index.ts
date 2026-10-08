@@ -54,3 +54,11 @@ export interface Task {
   priority?: Priority;
   status: ExtendedStatus;
 }
+
+export interface Event {
+  id: string;
+  userId?: string;
+  title: string;
+  date: string; // ISO date string (YYYY-MM-DD)
+  notes?: string;
+}
